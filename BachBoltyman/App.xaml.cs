@@ -126,11 +126,17 @@ namespace BachBoltzman
             get => f;
             set => f = value;
         }
-        private bool wall;
+        private bool wall = false;
         public bool IsWall 
         {
             get => wall;
             set => wall = value;
+        }
+        private bool movingWall=false;
+        public bool IsMovingWall
+        {
+            get => movingWall;
+            set => movingWall = value;
         }
         public double Density
         {
@@ -216,6 +222,31 @@ namespace BachBoltzman
                 Lattice.Lattices[px, py].f[1] = Lattice.Lattices[px, py].f_post[3];
             }
 
+            //checking moving wall
+            if (Lattice.Lattices[px + 1, py].IsMovingWall) //left
+            {
+                Lattice.Lattices[px, py].f[8] = Lattice.Lattices[px, py].f_post[6];
+                Lattice.Lattices[px, py].f[5] = Lattice.Lattices[px, py].f_post[7];
+                Lattice.Lattices[px, py].f[1] = Lattice.Lattices[px, py].f_post[3];
+            }
+            if (Lattice.Lattices[px, py + 1].IsMovingWall) //up
+            {
+                Lattice.Lattices[px, py].f[8] = Lattice.Lattices[px, py].f_post[6];
+                Lattice.Lattices[px, py].f[5] = Lattice.Lattices[px, py].f_post[7];
+                Lattice.Lattices[px, py].f[1] = Lattice.Lattices[px, py].f_post[3];
+            }
+            if (Lattice.Lattices[px - 1, py].IsMovingWall) //right
+            {
+                Lattice.Lattices[px, py].f[8] = Lattice.Lattices[px, py].f_post[6];
+                Lattice.Lattices[px, py].f[5] = Lattice.Lattices[px, py].f_post[7];
+                Lattice.Lattices[px, py].f[1] = Lattice.Lattices[px, py].f_post[3];
+            }
+            if (Lattice.Lattices[px, py - 1].IsMovingWall) //down
+            {
+                Lattice.Lattices[px, py].f[8] = Lattice.Lattices[px, py].f_post[6];
+                Lattice.Lattices[px, py].f[5] = Lattice.Lattices[px, py].f_post[7];
+                Lattice.Lattices[px, py].f[1] = Lattice.Lattices[px, py].f_post[3];
+            }
         }
         static void InitializeLayout(bool[,] layout) 
         {
@@ -272,16 +303,32 @@ namespace BachBoltzman
                 }
             }
         }
-        static void Run(bool[,] layout, int timeCykle) 
+        static void Run(bool[,] layout, int timeCykle,int timeSnap) 
         {
+            //ukoly ImgOutput https://nerdparadise.com/programming/csharpimageediting
+            //Img input https://learn.microsoft.com/en-us/dotnet/api/system.windows.media.imaging.writeablebitmap?view=windowsdesktop-9.0&redirectedfrom=MSDN , https://learn.microsoft.com/en-us/dotnet/api/system.windows.uielement.mouserightbuttondown?view=windowsdesktop-9.0#system-windows-uielement-mouserightbuttondown
+            double[,,] outputDensity = new double[x,y,Convert.ToInt32(timeCykle/timeSnap)];
+ 
             Lattice.InitializeLayout(layout);
             Lattice.InitializeEquilibrium(timeCykle);
-            for(int t = 0; t < timeCykle; t++)
+
+            int i = 0;
+            for (int t = 0; t < timeCykle; t++)
             {
                 Lattice.CollideBGK();
                 Lattice.Stream();
+                if (t%timeSnap ==0) 
+                {
+                    for (int px = 0; px<x; px++) 
+                    {
+                        for (int py = 0; py<y; py++) 
+                        {
+                            outputDensity[px,py,i] =Lattice.Lattices[px,py].Density;
+                            i++;
+                        }
+                    }
+                }
             }
-          
         }
     }
 }

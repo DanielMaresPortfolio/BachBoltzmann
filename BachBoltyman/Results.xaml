@@ -5,7 +5,20 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BachBoltyman"
         mc:Ignorable="d"
-        Title="Results" Height="450" Width="800">
-       
-        <Grid/>
+        Title="Results" Height="500" Width="500">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="9*"/>
+        </Grid.ColumnDefinitions>
+        <ComboBox>
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding SelectedTime}"/>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+        <Image x:Name="Heatmap" Grid.Column="1" Source="{Binding Heatmap}"/>
+    </Grid>
 </Window>

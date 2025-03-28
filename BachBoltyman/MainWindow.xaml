@@ -27,6 +27,6 @@
                 <RowDefinition Height="1*"></RowDefinition>
             </Grid.RowDefinitions>
         </Grid>
-        <Button Name="testing" Grid.Column="2" Content="testing" Grid.Row="1" Click="Teslting" BorderBrush="#FFFFF5F5"/>
+        <Button Name="testing" Grid.Column="2" Content="testing" Grid.Row="1" Click="Testing" BorderBrush="#FFFFF5F5"/>
     </Grid>
 </Window>

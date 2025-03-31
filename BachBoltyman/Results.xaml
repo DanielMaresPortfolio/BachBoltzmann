@@ -12,13 +12,10 @@
             <ColumnDefinition Width="1*" />
             <ColumnDefinition Width="9*"/>
         </Grid.ColumnDefinitions>
-        <ComboBox>
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding SelectedTime}"/>
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
+        <Grid.RowDefinitions>
+        </Grid.RowDefinitions>
+
+        <ListBox x:Name="TimeSelect" SelectionChanged="ListBox_SelectionChanged" ItemsSource="{Binding AllTime}" />
         <Image x:Name="Heatmap" Grid.Column="1" Source="{Binding Heatmap}"/>
     </Grid>
 </Window>

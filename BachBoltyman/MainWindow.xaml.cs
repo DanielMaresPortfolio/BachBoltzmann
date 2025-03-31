@@ -24,10 +24,19 @@ namespace BachBoltyman
 
         private void Testing(object sender, RoutedEventArgs e)
         {
+            int timeCykle = 1;
+            int timeSnap = 1;
+            int[] timeScale = new int[timeCykle/timeSnap];
             InicLayout layout = new InicLayout();
-            Lattice lattice = new Lattice(layout.SizeX, layout.SizeY, 0.1, layout.TestingLayout);
+            Lattice lattice = new Lattice(layout.SizeX, layout.SizeY, 0.1);
+            lattice.Run(1,1,0.1,0.1,0.1,layout.TestingLayout);
             //
-            Results results = new Results(lattice.Run( 10, 10, 0.01,0.01));
+            for (int i = 0; i < timeCykle / timeSnap; i++)
+            {
+                timeScale[i] = i * timeSnap;
+            }
+            Results results = new Results(Lattice.OutputSpeeds, Lattice.OutputDensity, timeScale);
+            //results.DensityMap = Lattice.OutputDensity;
             this.Visibility = Visibility.Collapsed;
             results.Show();
         }

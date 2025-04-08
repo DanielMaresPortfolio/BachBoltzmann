@@ -46,7 +46,7 @@ namespace BachBoltzman
     public class D2Q9
     {
         private static D2Q9 instance;
-        public static D2Q9 Instance //Singleton (nejspspíše předělám na dědičnost z abstrakt třídy)
+        public static D2Q9 Instance //Singleton (Maybe shoul be remade to be abstrakt class, then added constants to that)
         {
             get
             {
@@ -100,7 +100,7 @@ namespace BachBoltzman
         private static Lattice[,] Latices_post;
         public static double[,,] OutputDensity;
         public static double[,,] OutputSpeeds;
-        public Lattice(int sizeX, int sizeY, double viscosity)
+        public Lattice(int sizeX, int sizeY, double viscosity) //added this because i had problems with inicializing Lattices to max lenght
         {
             double vis = viscosity;
 
@@ -209,7 +209,7 @@ namespace BachBoltzman
             }
             return v;
         }
-        public double[] Equilibrium(double inSpeedInX, double inSpeedInY)
+        public double[] Equilibrium(double inSpeedInX, double inSpeedInY) //overloading construktor for first inic, where you have to use inicial velocities, in top, you use allready present speeds
         {
             double[] v = new double[d2Q9.NumberOfSpeeds];
             double[] cu = new double[d2Q9.NumberOfSpeeds];
@@ -249,7 +249,7 @@ namespace BachBoltzman
                     Lattice.Lattices[px, py].f[1] = Lattice.Lattices[px, py].f_post[3];
                 }
 
-                //checking moving wall, I should make it changeble
+                //checking moving wall, I should make it changeble in input
                 double densityWall = 1;
                 double uWallX = 0.1;
                 if (Lattice.Lattices[px - 1, py].IsMovingWall) //right
@@ -352,7 +352,7 @@ namespace BachBoltzman
             InitializeLayout(layout);
             InitializeEquilibrium(inicialSpeedInX, inicialSpeedInY,inicialViskozkozity);
             int i = 0;
-            for (int t = 0; t < timeCykle-1; t++)
+            for (int t = 0; t < timeCykle; t++)
             {
                 if (t % timeSnap == 0)
                 {
@@ -366,13 +366,9 @@ namespace BachBoltzman
                     }
                 i++;
                 }
-                CollideBGK();
                 Stream();
+                CollideBGK();
             }
         }
-        //private static double[,,] outputSpeed;
-        //public static double[,,] OutputSpeed {get => outputSpeed; set => outputSpeed = value; }
-        //private static double[,,] outputDensity;
-        //public static double[,,] OutputDensity { get => outputDensity; set => outputDensity = value; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -24,19 +25,18 @@ namespace BachBoltyman
 
         private void Testing(object sender, RoutedEventArgs e)
         {
-            int timeCykle = 1;
-            int timeSnap = 1;
-            int[] timeScale = new int[timeCykle/timeSnap];
+            int timeCykle = 10; //this says how many times whole lattice will be simulated
+            int timeSnap = 2;  //this says whitch data will be saved(every n-th) 
             InicLayout layout = new InicLayout();
             Lattice lattice = new Lattice(layout.SizeX, layout.SizeY, 0.1);
-            lattice.Run(1,1,0.1,0.1,0.1,layout.TestingLayout);
+            lattice.Run(timeCykle,timeSnap,0.1,0.1,0.1,layout.TestingLayout);
+            int[] timeScale = new int[timeCykle / timeSnap];
             //
             for (int i = 0; i < timeCykle / timeSnap; i++)
             {
                 timeScale[i] = i * timeSnap;
             }
             Results results = new Results(Lattice.OutputSpeeds, Lattice.OutputDensity, timeScale);
-            //results.DensityMap = Lattice.OutputDensity;
             this.Visibility = Visibility.Collapsed;
             results.Show();
         }

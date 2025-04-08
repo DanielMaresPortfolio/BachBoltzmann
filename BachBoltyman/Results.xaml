@@ -16,6 +16,6 @@
         </Grid.RowDefinitions>
 
         <ListBox x:Name="TimeSelect" SelectionChanged="ListBox_SelectionChanged" ItemsSource="{Binding AllTime}" />
-        <Image x:Name="Heatmap" Grid.Column="1" Source="{Binding Heatmap}"/>
+        <Image x:Name="Heatmap" Grid.Column="1"/>
     </Grid>
 </Window>

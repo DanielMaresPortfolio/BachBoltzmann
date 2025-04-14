@@ -16,24 +16,36 @@ namespace BachBoltzman
     }
     public class InicLayout
     {
-        private int sx = 500;
-        private int sy = 100;
+        private int sx = 10; //100
+        private int sy = 5; //50
         public int SizeX { get => sx; set => sx = value; }
         public int SizeY { get => sy; set => sy = value; }
         public bool[,] MyLayout { get; set; }
         public bool[,] TestingLayout
         {
             get {
-                int px = 200;
-                int py = 50;
-                int r = 20;
-                bool[,] testingLayout = new bool[sx, sy];
+                //int px = 70;
+                //int py = 25;
+                //int r = 10;
+                //bool[,] testingLayout = new bool[sx, sy];
+                //for (int x = 0; x < sx; x++)
+                //{
+                //    for (int y = 0; y < sy; y++)
+                //    {
+                //        testingLayout[x, y] = false;
+                //        if ((((x - px) * (x - px)) + ((y - py) * (y - py))) < r * r || y == 0 || y == (sy - 1))
+                //        {
+                //            testingLayout[x, y] = true;
+                //        }
+                //    }
+                //}
+                    bool[,] testingLayout = new bool[sx, sy];
                 for (int x = 0; x < sx; x++)
                 {
                     for (int y = 0; y < sy; y++)
                     {
                         testingLayout[x, y] = false;
-                        if ((x - px) * (x - px) + (y - py) * (y - py) < r * r || y == 0 || y == py)
+                        if ( y == 0 || y == (sy - 1))
                         {
                             testingLayout[x, y] = true;
                         }
@@ -252,7 +264,7 @@ namespace BachBoltzman
                 //checking moving wall, I should make it changeble in input
                 double densityWall = 1;
                 double uWallX = 0.1;
-                if (Lattice.Lattices[px - 1, py].IsMovingWall) //right
+                if (Lattice.Lattices[px, py].IsMovingWall) //right
                 {
                     Lattice.Lattices[px, py].f[8] = Lattice.Lattices[px, py].f_post[6] - 2 * d2Q9.WeightsOfEDFs[3] * densityWall * d2Q9.InicialSpeedX[6] * uWallX / d2Q9.SoundSpeedPowerTwo;
                     Lattice.Lattices[px, py].f[5] = Lattice.Lattices[px, py].f_post[7] - 2 * d2Q9.WeightsOfEDFs[3] * densityWall * d2Q9.InicialSpeedX[7] * uWallX / d2Q9.SoundSpeedPowerTwo;
@@ -260,11 +272,11 @@ namespace BachBoltzman
                     // for first tests right wall is enough 
                 }
                 //pressure outlow
-                if (Lattice.Lattices[px + 1, py].IsPressureOutFlow)
+                if (Lattice.Lattices[px, py].IsPressureOutFlow)
                 {
-                    Lattice.Lattices[px, py].f[1] = Lattice.Lattices[px, py - d2Q9.InicialSpeedY[3]].f_post[1];
-                    Lattice.Lattices[px, py].f[5] = Lattice.Lattices[px, py - d2Q9.InicialSpeedY[7]].f_post[8];
-                    Lattice.Lattices[px, py].f[8] = Lattice.Lattices[px, py - d2Q9.InicialSpeedY[6]].f_post[5];
+                    Lattice.Lattices[px, py].f[3] = Lattice.Lattices[px, py - d2Q9.InicialSpeedY[1]].f_post[1];
+                    Lattice.Lattices[px, py].f[7] = Lattice.Lattices[px, py - d2Q9.InicialSpeedY[5]].f_post[5];
+                    Lattice.Lattices[px, py].f[6] = Lattice.Lattices[px, py - d2Q9.InicialSpeedY[8]].f_post[8];
                 }
         }
         static void InitializeLayout(bool[,] layout)
@@ -316,6 +328,7 @@ namespace BachBoltzman
                         if (jd >= 0 && jd < x && id >= 0 && id <= y)
                         {
                             Lattices[j, i].f[k] = Lattices[j, i].f_post[k];
+
                             if (j!=0 && i !=0 && j > x && i > y) 
                             {
                                 BounceBack(j, i);
@@ -325,7 +338,7 @@ namespace BachBoltzman
                 }
             }
         }
-        static void CollideBGK() //pokud budou jine tau tak predelat na res. v jednom uzlu
+        static void CollideBGK()
         {
             int x = Lattices.GetLength(0);
             int y = Lattices.GetLength(1);
@@ -366,8 +379,8 @@ namespace BachBoltzman
                     }
                 i++;
                 }
-                Stream();
                 CollideBGK();
+                Stream();
             }
         }
     }

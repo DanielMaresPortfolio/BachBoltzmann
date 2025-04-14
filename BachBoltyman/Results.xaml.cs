@@ -16,6 +16,8 @@ using System.Windows.Media.Media3D;
 using System.Windows.Shapes;
 using BachBoltzman;
 using System.ComponentModel;
+using System.Xaml;
+using System.Linq;
 
 namespace BachBoltyman
 {
@@ -24,75 +26,113 @@ namespace BachBoltyman
     /// </summary>
     public partial class Results : Window, INotifyPropertyChanged
     {
-        public Results(double[,,] speedMap_,double[,,] densityMap_ ,int[] alltime_)
+        public Results(double[,,] speedMap_, double[,,] densityMap_, int[] alltime_)
         {
             SpeedMap = speedMap_;
             DensityMap = densityMap_;
             AllTime = alltime_;
             DataContext = this;
-            InitializeComponent();    
+            InitializeComponent();
         }
         public event PropertyChangedEventHandler? PropertyChanged;
         private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
-            DrawOutput(SpeedMap,TimeSelect.SelectedIndex);
+            DrawOutput(DensityMap, TimeSelect.SelectedIndex);
         }
         public double[,,] SpeedMap { get; set; }
         public double[,,] DensityMap { get; set; }
         public int[] AllTime
         {
-            get;set;
+            get; set;
         }
-        public void DrawOutput(double[,,] map, int index) //vymyslet dynamickej resize / nebo prostě to po výsledcích dát z lattice nastavit  
+        public void DrawOutput(double[,,] map, int index)
         {
-                Heatmap.Width = SpeedMap.GetLength(0);
-                Heatmap.Height = SpeedMap.GetLength(1);
-                int width = Convert.ToInt32(Heatmap.Width);
-                int height = Convert.ToInt32(Heatmap.Height);
-                WriteableBitmap bitmap = new WriteableBitmap(width, height, 96, 96, PixelFormats.Bgra32, null);
-                            uint[] pixels = new uint[width * height];
-                           for (int ix = 0; ix < width; ix++)
-                            {
-                                for (int iy = 0; iy < height; iy++) //nastavit velikost podle vstupu!
-                                {
-                                   int i = width * iy + ix;
-                                    switch (map[ix, iy, index])//colours cs^2 = 1/3 -> 0:0.577 
-                                    {
-                                             // spatne barvy << je byte posuv
-                                             // proc furt nic neukazuje? Fak v koncich
-                                             case -1:
-                                                pixels[i] = (uint)((255 >> 24) + (0>>16) + (0>>8)); //wall colour (pure blue)
-                                            break;
-                                             case > 0.577:
-                                                pixels[i] = (uint)((0 >> 24) + (0 >> 16) + (255 >> 8)); //error colour (pure green)
-                                            break;
-                                             case double n when (n > 0 && n < 0.115):
-                                                pixels[i] = (uint)((251 >> 24) + (99 >> 16) + (11 >> 8));
-                                            break;
-                                            case double n when (n > 0.115 && n < 0.231):
-                                                pixels[i] = (uint)((250 >> 24) + (70 >> 16) + (48 >> 8));
-                                            break;
-                                            case double n when (n > 0.231 && n < 0.346):
-                                                pixels[i] = (uint)((233 >> 24) + (50 >> 16) + (73 >> 8));
-                                            break;
-                                            case double n when (n > 0.346 && n < 0.462):
-                                                pixels[i] = (uint)((196 >> 24) + (54 >> 16) + (87 >> 8));
-                                            break;
-                                            case double n when (n > 0.462 && n < 0.577):
-                                                pixels[i] = (uint)((171 >> 24) + (55 >> 16) + (87 >> 8));
-                                            break;
-                                            default:
-                                                pixels[i] = (uint)((0 >> 24) + (0 >>16) + (255 >> 8)); //error colour (pure green)
-                                            break;
-                                    }                                          
-                                }
-                            }
-                       bitmap.WritePixels(new Int32Rect(0, 0, width, height), pixels, width * 4, 0);
-                       Heatmap.Source = bitmap;
-        }
+            Heatmap.Width = SpeedMap.GetLength(0);
+            Heatmap.Height = SpeedMap.GetLength(1);
+            int width = Convert.ToInt32(Heatmap.Width);
+            int height = Convert.ToInt32(Heatmap.Height);
+            WriteableBitmap bitmap = new WriteableBitmap(width, height, 96, 96, PixelFormats.Bgra32, null); //zdroj https://learn.microsoft.com/en-us/dotnet/api/system.windows.media.imaging.writeablebitmap?view=windowsdesktop-9.0&redirectedfrom=MSDN
+            uint[] pixels = new uint[width * height];
+            double[,] mapInTime = new double[map.GetLength(0), map.GetLength(1)];
+            //
 
+            for (int ix = 0; ix < width; ix++)
+            {
+                for (int iy = 0; iy < height; iy++)
+                {
+                    mapInTime[ix, iy] = map[ix, iy, index];
+                }
+            }
+            //
+            double maxValueMap = (from double d in mapInTime select d).Max();
+            //pallete // ta <<24 je bulharska konstanta, nesahat
+            uint zc = (uint)((Convert.ToUInt32(255) << 24) + (Convert.ToUInt32(0) << 16) + (Convert.ToUInt32(0) << 8) + Convert.ToUInt32(0));
+            uint fc = (uint) ((Convert.ToUInt32(255) << 24) + (Convert.ToUInt32(251) << 16) + (Convert.ToUInt32(99) << 8) + Convert.ToUInt32(11));
+            uint sc = (uint) ((Convert.ToUInt32(255) << 24) + (Convert.ToUInt32(250) << 16) + (Convert.ToUInt32(70) << 8) + Convert.ToUInt32(48)); 
+            uint tc = (uint) ((Convert.ToUInt32(255) << 24) + (Convert.ToUInt32(233) << 16) + (Convert.ToUInt32(50) << 8) + Convert.ToUInt32(73)); 
+            uint foc =(uint) ((Convert.ToUInt32(255) << 24) + (Convert.ToUInt32(196) << 16) + (Convert.ToUInt32(54) << 8) + Convert.ToUInt32(87)); 
+            uint fic =(uint) ((Convert.ToUInt32(255) << 24) + (Convert.ToUInt32(171) << 16) + (Convert.ToUInt32(55) << 8) + Convert.ToUInt32(87));
+            uint bac = (uint)((Convert.ToUInt32(255) << 24) + (Convert.ToUInt32(160) << 16) + (Convert.ToUInt32(160) << 8) + Convert.ToUInt32(160));
+            for (int ix = 0; ix < width; ix++)
+            {
+                for (int iy = 0; iy < height; iy++) //nastavit velikost podle vstupu!
+                {
+                    int i = width * iy + ix;
+                    //uint alpha = Convert.ToUInt32(255 - ((maxValueMap - mapInTime[ix, iy]) / maxValueMap) * 100);
+                    switch (mapInTime[ix, iy])//colours cs^2 = 1/3 -> 0:0.577 
+                    {
+                        // spatne barvy << je byte posuv | RGB
+                        case -1:
+                            //pixels[i] = (uint)((Convert.ToUInt32(255) << 24) + (0 << 16) + (0 << 8));
+                            pixels[i] = zc; //wall colour (pure red) //works for Density
+                            break;
+                        //case > 0.577:
+                        //    pixels[i] = (uint)((0 << 24) + (0 << 16) + ((Convert.ToUInt32(255) << 8))); //error colour (pure blue) // for speed
+                        //   break;
+
+                        case double n when (n > 0 && n < maxValueMap / 5):
+                            pixels[i] = fc;
+                            break;
+                        case double n when (n > maxValueMap / 5 && n < 2 * maxValueMap / 5):
+                            pixels[i] = sc;
+                            break;
+                        case double n when (n > 2 * maxValueMap / 5 && n < 3 * maxValueMap / 5):
+                            pixels[i] = tc;
+                            break;
+                        case double n when (n > 3 * maxValueMap / 5 && n < 4 * maxValueMap / 5):
+                            pixels[i] = foc;
+                            break;
+                        case double n when (n > 4 * maxValueMap && n < maxValueMap):
+                            pixels[i] = fic;
+                            break;
+                        default:
+                            pixels[i] = bac;
+                            break;
+                    }
+                        bitmap.WritePixels(new Int32Rect(0, 0, width, height), pixels, width * 4, 0);
+                        Heatmap.Source = bitmap;                    
+                }
+            }
+        }
     }
+
+    //    try 
+    //    {
+    //        bitmap.Lock();
+    //        unsafe 
+    //        {
+
+    //        }
+    //        bitmap.AddDirtyRect(new Int32Rect(0, 0, width, height));
+    //    }
+    //    finally 
+    //    {
+    //        bitmap.Unlock(); 
+    //    }
+    //               Heatmap.Source = bitmap;
+    //}
+
     //public class Output() : INotifyPropertyChanged
     //{
     //    public event PropertyChangedEventHandler PropertyChanged;

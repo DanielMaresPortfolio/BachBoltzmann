@@ -27,6 +27,7 @@
                 <RowDefinition Height="1*"></RowDefinition>
             </Grid.RowDefinitions>
         </Grid>
+        <Image x:Name="InputLayout" Grid.Column="1" Grid.Row="1"/>
         <Button Name="testing" Grid.Column="2" Content="testing" Grid.Row="1" Click="Testing" BorderBrush="#FFFFF5F5"/>
     </Grid>
 </Window>

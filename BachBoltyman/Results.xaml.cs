@@ -14,7 +14,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Windows.Shapes;
-using BachBoltzman;
 using System.ComponentModel;
 using System.Xaml;
 using System.Linq;
@@ -66,52 +65,33 @@ namespace BachBoltyman
             }
             //
             double maxValueMap = (from double d in mapInTime select d).Max();
-            double minValueMap = (from double d in mapInTime select d).Min();
+            double minValueMap = 0;
+            foreach (double d in mapInTime) 
+            {
+
+            }
+
             //Console.WriteLine("Max hodnota" + "{0: F20}", maxValueMap);
             //Console.WriteLine("Min hodnota" + "{0: F20}", minValueMap);
 
-            //pallete // <<24 is transparency 
             uint zc = (uint)((Convert.ToUInt32(255) << 24) + (Convert.ToUInt32(0) << 16) + (Convert.ToUInt32(0) << 8) + Convert.ToUInt32(0));
-            //uint fc = (uint) ((Convert.ToUInt32(255) << 24) + (Convert.ToUInt32(251) << 16) + (Convert.ToUInt32(99) << 8) + Convert.ToUInt32(11));
-            //uint sc = (uint) ((Convert.ToUInt32(255) << 24) + (Convert.ToUInt32(250) << 16) + (Convert.ToUInt32(70) << 8) + Convert.ToUInt32(48)); 
-            //uint tc = (uint) ((Convert.ToUInt32(255) << 24) + (Convert.ToUInt32(233) << 16) + (Convert.ToUInt32(50) << 8) + Convert.ToUInt32(73)); 
-            //uint foc =(uint) ((Convert.ToUInt32(255) << 24) + (Convert.ToUInt32(196) << 16) + (Convert.ToUInt32(54) << 8) + Convert.ToUInt32(87)); 
-            //uint fic =(uint) ((Convert.ToUInt32(255) << 24) + (Convert.ToUInt32(171) << 16) + (Convert.ToUInt32(55) << 8) + Convert.ToUInt32(87));
-            //uint bac = (uint)((Convert.ToUInt32(255) << 24) + (Convert.ToUInt32(0) << 16) + (Convert.ToUInt32(255) << 8) + Convert.ToUInt32(0));
             for (int ix = 0; ix < width; ix++)
             {
                 for (int iy = 0; iy < height; iy++) 
                 {
                     int i = width * iy + ix;
-                    uint grad = Convert.ToUInt32(255 - ((maxValueMap - mapInTime[ix, iy]) / maxValueMap - minValueMap) * 255); //příliš malé rozdíly
+                    uint grad = Convert.ToUInt32(((maxValueMap - mapInTime[ix, iy]) / (maxValueMap - minValueMap))*255); //příliš malé rozdíly
                     switch (mapInTime[ix, iy])//colours cs^2 = 1/3 -> 0:0.577 
                     {
                         // spatne barvy << je byte posuv | RGB
                         case -1:
-                            //pixels[i] = (uint)((Convert.ToUInt32(255) << 24) + (0 << 16) + (0 << 8));
                             pixels[i] = zc; //wall colour (pure black) //works for Density
                             break;
-                        //case > 0.577:
-                        //    pixels[i] = (uint)((0 << 24) + (0 << 16) + ((Convert.ToUInt32(255) << 8))); //error colour (pure blue) // for speed
-                        //   break;
-
-                        //case double n when (n > 0 && n < maxValueMap / 5):
-                        //    pixels[i] = fc;
-                        //    break;
-                        //case double n when (n > maxValueMap / 5 && n < 2 * maxValueMap / 5):
-                        //    pixels[i] = sc;
-                        //    break;
-                        //case double n when (n > 2 * maxValueMap / 5 && n < 3 * maxValueMap / 5):
-                        //    pixels[i] = tc;
-                        //    break;
-                        //case double n when (n > 3 * maxValueMap / 5 && n < 4 * maxValueMap / 5):
-                        //    pixels[i] = foc;
-                        //    break;
-                        //case double n when (n > 4 * maxValueMap && n < maxValueMap):
-                        //    pixels[i] = fic;
-                        //    break;
+                        case > 1.5:
+                            pixels[i] = (uint)((Convert.ToUInt32(255) << 24) + (Convert.ToUInt32(0) << 16) + (Convert.ToUInt32(255) << 8) + Convert.ToUInt32(0)); 
+                            break;
                         default:
-                            pixels[i] = (uint)((Convert.ToUInt32(255) << 24) + (Convert.ToUInt32(255) << 16) + (Convert.ToUInt32(grad) << 8) + Convert.ToUInt32(grad)); ;
+                            pixels[i] = (uint)((Convert.ToUInt32(255) << 24) + (Convert.ToUInt32(255) << 16) + (Convert.ToUInt32(grad*2/3) << 8) + Convert.ToUInt32(grad*1/3));
                             break;
                     }
                         bitmap.WritePixels(new Int32Rect(0, 0, width, height), pixels, width * 4, 0);

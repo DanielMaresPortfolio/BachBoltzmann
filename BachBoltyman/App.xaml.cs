@@ -13,46 +13,46 @@ namespace BachBoltzman
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application
+    public partial class App : System.Windows.Application
     {
     }
     public class InicLayout
     {
-        private int sx = 500; //100
-        private int sy = 200; //50
+        private int sx = 500; //500
+        private int sy = 200; //200
         public int SizeX { get => sx; set => sx = value; }
         public int SizeY { get => sy; set => sy = value; }
         public bool[,] MyLayout { get; set; }
         public bool[,] TestingLayout
         {
             get {
-                int px = sx/2;
-                int py = sy/2;
-                int r = 10;
+                //int px = sx/2;
+                //int py = sy/2;
+                //int r = 10;
+                //bool[,] testingLayout = new bool[sx, sy];
+                //for (int x = 0; x < sx; x++)
+                //{
+                //    for (int y = 0; y < sy; y++)
+                //    {
+                //        testingLayout[x, y] = false;
+                //        if ((((x - px) * (x - px)) + ((y - py) * (y - py))) < r * r || y == 0 || y == (sy - 1))
+                //        {
+                //            testingLayout[x, y] = true;
+                //        }
+                //    }
+                //}
                 bool[,] testingLayout = new bool[sx, sy];
                 for (int x = 0; x < sx; x++)
                 {
                     for (int y = 0; y < sy; y++)
                     {
                         testingLayout[x, y] = false;
-                        if ((((x - px) * (x - px)) + ((y - py) * (y - py))) < r * r || y == 0 || y == (sy - 1))
+                        if (y == 0 || y == (sy - 1))
                         {
                             testingLayout[x, y] = true;
                         }
                     }
                 }
-                //    bool[,] testingLayout = new bool[sx, sy];
-                //for (int x = 0; x < sx; x++)
-                //{
-                //    for (int y = 0; y < sy; y++)
-                //    {
-                //        testingLayout[x, y] = false;
-                //        if ( y == 0 || y == (sy - 1))
-                //        {
-                //            testingLayout[x, y] = true;
-                //        }
-                //    }
-                //}
                 return testingLayout;
             }
         }
@@ -73,9 +73,9 @@ namespace BachBoltzman
         int d = 2;
         int q = 9;
         double cs = 1.0 / 3;
-        double[] wi = [4.0 / 9, 1.0 / 9, 1.0 / 9, 1.0 / 9, 1.0 / 36, 1.0 / 36, 1.0 / 36, 1.0 / 36, 1.0 / 36];
-        int[] cx = [0, 1, 0, -1, 0, 1, -1, -1, 1];
-        int[] cy = [0, 0, 1, 0, -1, 1, 1, -1, -1];
+        double[] wi = { 4.0 / 9, 1.0 / 9, 1.0 / 9, 1.0 / 9, 1.0 / 9, 1.0 / 36, 1.0 / 36, 1.0 / 36, 1.0 / 36 };
+        int[] cx = { 0, 1, 0, -1, 0, 1, -1, -1, 1 };
+        int[] cy = { 0, 0, 1, 0, -1, 1, 1, -1, -1 };
         public double SoundSpeedPowerTwo
         {
             get => cs;
@@ -107,7 +107,7 @@ namespace BachBoltzman
             set { }
         }
     }
-    class Lattice
+    public class Lattice
     {
         private static D2Q9 d2Q9 = D2Q9.Instance;
         private static Lattice[,] Lattices;
@@ -244,28 +244,28 @@ namespace BachBoltzman
                 }
                 if (Lattices[px, py + 1].IsWall) //up
                 {
+                    Lattices[px, py].f[7] = Lattices[px, py].f_post[5];
+                    Lattices[px, py].f[4] = Lattices[px, py].f_post[2];
                     Lattices[px, py].f[8] = Lattices[px, py].f_post[6];
-                    Lattices[px, py].f[5] = Lattices[px, py].f_post[7];
-                    Lattices[px, py].f[1] = Lattices[px, py].f_post[3];
                 }
                 if (Lattices[px + 1, py].IsWall) //right
                 {
-                    Lattices[px, py].f[8] = Lattices[px, py].f_post[6];
-                    Lattices[px, py].f[5] = Lattices[px, py].f_post[7];
-                    Lattices[px, py].f[1] = Lattices[px, py].f_post[3];
+                    Lattices[px, py].f[6] = Lattices[px, py].f_post[8];
+                    Lattices[px, py].f[3] = Lattices[px, py].f_post[1];
+                    Lattices[px, py].f[7] = Lattices[px, py].f_post[5];
                 }
                 if (Lattices[px, py - 1].IsWall) //down
                 {
-                    Lattices[px, py].f[8] = Lattices[px, py].f_post[6];
+                    Lattices[px, py].f[6] = Lattices[px, py].f_post[8];
+                    Lattices[px, py].f[2] = Lattices[px, py].f_post[4];
                     Lattices[px, py].f[5] = Lattices[px, py].f_post[7];
-                    Lattices[px, py].f[1] = Lattices[px, py].f_post[3];
                 }
         }
         static void InflowAndOuflow(int px, int py, double densityWall,double uWallX) 
         {
             //double densityWall = 1;
             //double uWallX = 0.1;
-            if (Lattices[px, py].IsMovingWall) //right
+            if (Lattices[px, py].IsMovingWall) //left
             {
                 Lattices[px, py].f[8] = Lattices[px, py].f_post[6] - 2 * d2Q9.WeightsOfEDFs[3] * densityWall * d2Q9.InicialSpeedX[6] * uWallX / d2Q9.SoundSpeedPowerTwo;
                 Lattices[px, py].f[5] = Lattices[px, py].f_post[7] - 2 * d2Q9.WeightsOfEDFs[3] * densityWall * d2Q9.InicialSpeedX[7] * uWallX / d2Q9.SoundSpeedPowerTwo;
@@ -273,12 +273,17 @@ namespace BachBoltzman
                 // for first tests right wall is enough 
             }
             //pressure outlow Zao 2.79 -2.82
-            if (Lattices[px, py].IsPressureOutFlow) //rychlostní vstup je v levo, takže toto je podle Zao vstup //proč nejsou modelovány podle f_post?
+            if (Lattices[px, py].IsPressureOutFlow)
             {
-                double uin = Math.Sqrt(d2Q9.SoundSpeedPowerTwo) - Math.Sqrt(d2Q9.SoundSpeedPowerTwo) / densityWall * (2*Lattices[px, py].f[3]+2*Lattices[px, py].f[6]+2*Lattices[px, py].f[7]+ Lattices[px, py].f[0]+ Lattices[px, py].f[2]+ Lattices[px, py].f[4]);
-                Lattices[px, py].f[1] = Lattices[px, py].Equilibrium()[1] + Lattices[px, py].f[3] - Lattices[px, py].Equilibrium()[3];
-                Lattices[px, py].f[8] = (Lattices[px,py].f[2] - Lattices[px, py].f[4] + 2 * Lattices[px, py].f[6] + Lattices[px, py].f[3] - Lattices[px, py].f[1]+uin *densityWall/Math.Sqrt(d2Q9.SoundSpeedPowerTwo))/2;
-                Lattices[px, py].f[5] = densityWall - (Lattices[px, py].f[0]+ Lattices[px, py].f[2] + Lattices[px, py].f[3] + Lattices[px, py].f[4] + Lattices[px, py].f[6] + Lattices[px, py].f[7] + Lattices[px, py].f[8]);
+                //double uin = Math.Sqrt(d2Q9.SoundSpeedPowerTwo) - Math.Sqrt(d2Q9.SoundSpeedPowerTwo) / densityWall * (2*Lattices[px, py].f[3]+2*Lattices[px, py].f[6]+2*Lattices[px, py].f[7]+ Lattices[px, py].f[0]+ Lattices[px, py].f[2]+ Lattices[px, py].f[4]);
+                //Lattices[px, py].f[1] = Lattices[px, py].Equilibrium()[1] + Lattices[px, py].f[3] - Lattices[px, py].Equilibrium()[3];
+                //Lattices[px, py].f[8] = (Lattices[px,py].f[2] - Lattices[px, py].f[4] + 2 * Lattices[px, py].f[6] + Lattices[px, py].f[3] - Lattices[px, py].f[1]+uin *densityWall/Math.Sqrt(d2Q9.SoundSpeedPowerTwo))/2;
+                //Lattices[px, py].f[5] = densityWall - (Lattices[px, py].f[0]+ Lattices[px, py].f[2] + Lattices[px, py].f[3] + Lattices[px, py].f[4] + Lattices[px, py].f[6] + Lattices[px, py].f[7] + Lattices[px, py].f[8]);
+
+                double uin = Math.Sqrt(d2Q9.SoundSpeedPowerTwo) - Math.Sqrt(d2Q9.SoundSpeedPowerTwo) / densityWall * (2 * Lattices[px, py].f_post[3] + 2 * Lattices[px, py].f[6] + 2 * Lattices[px, py].f_post[7] + Lattices[px, py].f_post[0] + Lattices[px, py].f_post[2] + Lattices[px, py].f_post[4]);
+                Lattices[px, py].f[3] = Lattices[px, py].Equilibrium()[3] + Lattices[px, py].f[1] - Lattices[px, py].Equilibrium()[1];
+                Lattices[px, py].f[7] = (Lattices[px, py].f[2] - Lattices[px, py].f[4] + 2 * Lattices[px, py].f_post[8] + Lattices[px, py].f[1] - Lattices[px, py].f[3] + uin * densityWall / Math.Sqrt(d2Q9.SoundSpeedPowerTwo)) / 2;
+                Lattices[px, py].f[6] = densityWall - (Lattices[px, py].f[0] + Lattices[px, py].f[2] + Lattices[px, py].f[1] + Lattices[px, py].f[4] + Lattices[px, py].f[5] + Lattices[px, py].f[8] + Lattices[px, py].f[7]);
             }
         }
         static void InitializeLayout(bool[,] layout)
@@ -289,11 +294,11 @@ namespace BachBoltzman
                 {
                     Lattices[ix, iy] = new Lattice();
                     Lattices[ix, iy].IsWall = layout[ix, iy];
-                    if (ix == Lattices.GetLength(0))
+                    if (ix == 0)
                     {
                         Lattices[ix, iy].IsMovingWall = true;
                     }
-                    if (ix == 0)
+                    if (ix == Lattices.GetLength(0))
                     {
                         Lattices[ix, iy].IsPressureOutFlow = true;
                     }
@@ -304,11 +309,11 @@ namespace BachBoltzman
         {
             foreach (Lattice lattice in Lattices)
             {
-                //if (lattice.IsWall == false) 
-                //{
+                if (lattice.IsWall == false) 
+                {
                     lattice.Viskozity = inicialViskozity;
                     lattice.f = lattice.Equilibrium(inicialSpeedX, inicialSpeedY);
-                //}
+                }
             }
         }
         static void Stream()
@@ -325,8 +330,6 @@ namespace BachBoltzman
             {
                 for (i = 0; i < y; i++)
                 {
-                   // if (Lattices[j,i].IsWall ==false) 
-                   //{
                         for (k = 0; k < d2Q9.NumberOfSpeeds; k++)
                         {
                             //Reseno Upwindem
@@ -334,15 +337,19 @@ namespace BachBoltzman
                             id = i - d2Q9.InicialSpeedX[k];
                             if (jd >= 0 && jd < x && id >= 0 && id < y)
                             {
-                                Lattices[j, i].f[k] = Lattices[jd, id].f_post[k];
+                                if (Lattices[jd,id].IsWall == false)
+                                {
+                                    Lattices[j, i].f[k] = Lattices[jd, id].f_post[k];
+                                }
+                                else 
+                                {
+                                    if (Lattices[j,i].IsWall == false && j !=0 && j !=x-1) 
+                                    {
+                                        BounceBack(j, i);
+                                    }
+                                }
                             }
                         }
-                   //}
-                    if (j != x-1 && i != y-1 && j !=0 && i !=0)  
-                    {
-                        BounceBack(j, i);
-                    }
-
                     if (j == 0 || j == x)
                     {
                         InflowAndOuflow(j, i, 1,0.1);
@@ -361,8 +368,11 @@ namespace BachBoltzman
                 {
                     for (int k = 0; k < d2Q9.NumberOfSpeeds; k++)
                     {
-                        double omega = (Lattices[ix, iy].f[k] - Lattices[ix, iy].Equilibrium()[k]) / Lattices[ix, iy].RelaxTime;
-                        Lattices[ix, iy].f_post[k] = Lattices[ix, iy].f[k] - omega;
+                        if (Lattices[ix,iy].IsWall == false) 
+                        {
+                            double omega = (Lattices[ix, iy].f[k] - Lattices[ix, iy].Equilibrium()[k]) / Lattices[ix, iy].RelaxTime;
+                            Lattices[ix, iy].f_post[k] = Lattices[ix, iy].f[k] - omega;
+                        }
                     }
                 }
             }
@@ -372,14 +382,14 @@ namespace BachBoltzman
             int x = Lattices.GetLength(0);
             int y = Lattices.GetLength(1);
 
-            OutputSpeeds = new double[x,y,Convert.ToInt32(timeCykle/timeSnap)];
-            OutputDensity = new double[x, y, Convert.ToInt32(timeCykle / timeSnap)];
+            OutputSpeeds = new double[x,y,Convert.ToInt32((timeCykle / timeSnap) + 1)];
+            OutputDensity = new double[x, y, Convert.ToInt32((timeCykle / timeSnap) +  1)];
             InitializeLayout(layout);
             InitializeEquilibrium(inicialSpeedInX, inicialSpeedInY,inicialViskozkozity);
             int i = 0;
-            string densityLine = null;
-            List<string> DensityText = new List<string>();
-            for (int t = 0; t < timeCykle; t++)
+            //string densityLine = null;
+            //List<string> DensityText = new List<string>();
+            for (int t = 0; t <= timeCykle; t++)
             {
                 if (t % timeSnap == 0)
                 {
@@ -389,20 +399,20 @@ namespace BachBoltzman
                         {
                             OutputSpeeds[px, py, i] = Math.Sqrt(Math.Pow(Lattices[px, py].SpeedInX, 2) + Math.Pow(Lattices[px, py].SpeedInY, 2));
                             OutputDensity[px, py, i] = Lattices[px, py].Density;
-                            densityLine +=(" {0: F10}", Lattices[px, py].Density);
+                            //densityLine +=(" {0: F10}", Lattices[px, py].Density);
                         }
-                        DensityText.Add("---------------------");
-                        DensityText.Add(densityLine);
+                       // DensityText.Add("---------------------");
+                        //DensityText.Add(densityLine);
                     }
                 i++;
-                    using (StreamWriter outputFile = new StreamWriter("C:\\Users\\mares\\source\\repos\\BachBoltyman\\BachBoltyman\\Density.txt")) //nefungovalo .\Density
-                    {
-                        outputFile.WriteLine(Convert.ToString(i*timeSnap));
-                        foreach (string line in DensityText) 
-                        {
-                            outputFile.WriteLine(line);
-                        }
-                    }
+                    //using (StreamWriter outputFile = new StreamWriter("C:\\Users\\mares\\source\\repos\\BachBoltyman\\BachBoltyman\\Density.txt")) //nefungovalo .\Density
+                    //{
+                    //    outputFile.WriteLine(Convert.ToString(i*timeSnap));
+                    //    foreach (string line in DensityText) 
+                    //    {
+                    //        outputFile.WriteLine(line);
+                    //    }
+                    //}
                 }
                 CollideBGK();
                 Stream();

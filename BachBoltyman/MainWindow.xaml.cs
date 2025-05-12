@@ -26,13 +26,13 @@ namespace BachBoltyman
         private void Testing(object sender, RoutedEventArgs e)
         {
             int timeCykle = 100; //this says how many times whole lattice will be simulated
-            int timeSnap = 50;  //this says whitch data will be saved(every n-th) 
+            int timeSnap = 1;  //this says whitch data will be saved(every n-th) 
             InicLayout layout = new InicLayout();
             Lattice lattice = new Lattice(layout.SizeX, layout.SizeY, 0.1);
             lattice.Run(timeCykle,timeSnap,0.1,0.1,0.1,layout.TestingLayout);
-            int[] timeScale = new int[timeCykle / timeSnap];
+            int[] timeScale = new int[(timeCykle / timeSnap)+1];
             //
-            for (int i = 0; i < timeCykle / timeSnap; i++)
+            for (int i = 0; i <= timeCykle / timeSnap; i++)
             {
                 timeScale[i] = i * timeSnap;
             }

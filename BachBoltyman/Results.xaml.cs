@@ -17,6 +17,7 @@ using System.Windows.Shapes;
 using System.ComponentModel;
 using System.Xaml;
 using System.Linq;
+using BachBoltzman;
 
 namespace BachBoltyman
 {
@@ -25,7 +26,7 @@ namespace BachBoltyman
     /// </summary>
     public partial class Results : Window, INotifyPropertyChanged
     {
-        public Results(double[,,] speedMap_, double[,,] densityMap_, int[] alltime_)
+        public Results(double[,,] speedMap_, double[,,] densityMap_, int[] alltime_) //zkusit ref na Lattice v App
         {
             SpeedMap = speedMap_;
             DensityMap = densityMap_;
@@ -65,11 +66,7 @@ namespace BachBoltyman
             }
             //
             double maxValueMap = (from double d in mapInTime select d).Max();
-            double minValueMap = 0;
-            foreach (double d in mapInTime) 
-            {
-
-            }
+            double minValueMap = (from double d in mapInTime select d).Min();
 
             //Console.WriteLine("Max hodnota" + "{0: F20}", maxValueMap);
             //Console.WriteLine("Min hodnota" + "{0: F20}", minValueMap);

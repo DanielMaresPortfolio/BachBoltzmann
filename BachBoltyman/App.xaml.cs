@@ -18,8 +18,8 @@ namespace BachBoltzman
     }
     public class InicLayout
     {
-        private int sx = 500; //500
-        private int sy = 200; //200
+        private int sx = 200; //500
+        private int sy = 100; //200
         public int SizeX { get => sx; set => sx = value; }
         public int SizeY { get => sy; set => sy = value; }
         public bool[,] MyLayout { get; set; }
@@ -110,7 +110,7 @@ namespace BachBoltzman
     public class Lattice
     {
         private static D2Q9 d2Q9 = D2Q9.Instance;
-        private static Lattice[,] Lattices;
+        public static Lattice[,] Lattices;
         public static double[,,] OutputDensity;
         public static double[,,] OutputSpeeds;
         public Lattice(int sizeX, int sizeY, double viscosity) //added this because i had problems with inicializing Lattices to max lenght
@@ -265,12 +265,15 @@ namespace BachBoltzman
         {
             //double densityWall = 1;
             //double uWallX = 0.1;
-            if (Lattices[px, py].IsMovingWall) //left
+            if (Lattices[px, py].IsMovingWall) //left //post?
             {
-                Lattices[px, py].f[8] = Lattices[px, py].f_post[6] - 2 * d2Q9.WeightsOfEDFs[3] * densityWall * d2Q9.InicialSpeedX[6] * uWallX / d2Q9.SoundSpeedPowerTwo;
-                Lattices[px, py].f[5] = Lattices[px, py].f_post[7] - 2 * d2Q9.WeightsOfEDFs[3] * densityWall * d2Q9.InicialSpeedX[7] * uWallX / d2Q9.SoundSpeedPowerTwo;
-                Lattices[px, py].f[1] = Lattices[px, py].f_post[3] - 2 * d2Q9.WeightsOfEDFs[3] * densityWall * d2Q9.InicialSpeedX[3] * uWallX / d2Q9.SoundSpeedPowerTwo;
-                // for first tests right wall is enough 
+                //Lattices[px, py].f[8] = Lattices[px, py].f_post[6] - 2 * d2Q9.WeightsOfEDFs[8] * densityWall * d2Q9.InicialSpeedX[8] * uWallX / d2Q9.SoundSpeedPowerTwo;
+                Lattices[px, py].f[8] = Lattices[px, py].f_post[6];
+                //Lattices[px, py].f[5] = Lattices[px, py].f_post[7] - 2 * d2Q9.WeightsOfEDFs[5] * densityWall * d2Q9.InicialSpeedX[5] * uWallX / d2Q9.SoundSpeedPowerTwo;
+                Lattices[px, py].f[5] = Lattices[px, py].f_post[7];
+
+                Lattices[px, py].f_post[1] = Lattices[px, py].f_post[3] - 2 * d2Q9.WeightsOfEDFs[1] * densityWall * d2Q9.InicialSpeedX[1] * uWallX / d2Q9.SoundSpeedPowerTwo;
+                // for first task left wall is enough 
             }
             //pressure outlow Zao 2.79 -2.82
             if (Lattices[px, py].IsPressureOutFlow)
@@ -294,11 +297,11 @@ namespace BachBoltzman
                 {
                     Lattices[ix, iy] = new Lattice();
                     Lattices[ix, iy].IsWall = layout[ix, iy];
-                    if (ix == 0)
+                    if (ix == 0 && iy !=0 && iy != Lattices.GetLength(1))
                     {
                         Lattices[ix, iy].IsMovingWall = true;
                     }
-                    if (ix == Lattices.GetLength(0))
+                    if (ix == Lattices.GetLength(0) && iy != 0 && iy != Lattices.GetLength(1))
                     {
                         Lattices[ix, iy].IsPressureOutFlow = true;
                     }
@@ -316,7 +319,7 @@ namespace BachBoltzman
                 }
             }
         }
-        static void Stream()
+         public static void Stream()
         {
             int x = Lattices.GetLength(0);
             int y = Lattices.GetLength(1);
@@ -330,34 +333,34 @@ namespace BachBoltzman
             {
                 for (i = 0; i < y; i++)
                 {
-                        for (k = 0; k < d2Q9.NumberOfSpeeds; k++)
+                    for (k = 0; k < d2Q9.NumberOfSpeeds; k++)
+                    {
+                        //Reseno Upwindem
+                        jd = j - d2Q9.InicialSpeedX[k];
+                        id = i - d2Q9.InicialSpeedY[k];
+                        if (jd >= 0 && jd < x && id >= 0 && id < y)
                         {
-                            //Reseno Upwindem
-                            jd = j - d2Q9.InicialSpeedY[k];
-                            id = i - d2Q9.InicialSpeedX[k];
-                            if (jd >= 0 && jd < x && id >= 0 && id < y)
+                            if (Lattices[jd, id].IsWall == false)
                             {
-                                if (Lattices[jd,id].IsWall == false)
+                                Lattices[j, i].f[k] = Lattices[jd, id].f_post[k];
+                            }
+                            else
+                            {
+                                if (Lattices[j, i].IsWall == false && j != 0 && j != x - 1)
                                 {
-                                    Lattices[j, i].f[k] = Lattices[jd, id].f_post[k];
-                                }
-                                else 
-                                {
-                                    if (Lattices[j,i].IsWall == false && j !=0 && j !=x-1) 
-                                    {
-                                        BounceBack(j, i);
-                                    }
+                                    BounceBack(j, i);
                                 }
                             }
                         }
-                    if (j == 0 || j == x)
+                    }
+                    if (Lattices[j,i].IsMovingWall || Lattices[j,i].IsPressureOutFlow)
                     {
                         InflowAndOuflow(j, i, 1,0.1);
                     }
                 }
             }
         }
-        static void CollideBGK()
+        public static void CollideBGK()
         {
             int x = Lattices.GetLength(0);
             int y = Lattices.GetLength(1);
@@ -372,6 +375,10 @@ namespace BachBoltzman
                         {
                             double omega = (Lattices[ix, iy].f[k] - Lattices[ix, iy].Equilibrium()[k]) / Lattices[ix, iy].RelaxTime;
                             Lattices[ix, iy].f_post[k] = Lattices[ix, iy].f[k] - omega;
+                            if (Lattices[ix,iy].Density > 1.1) 
+                            {
+                                Console.WriteLine("bad");
+                            }
                         }
                     }
                 }

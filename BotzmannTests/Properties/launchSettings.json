@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "BotzmannTests (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "BotzmannTests (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

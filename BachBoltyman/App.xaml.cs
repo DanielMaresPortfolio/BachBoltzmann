@@ -233,48 +233,55 @@ namespace BachBoltzman
             }
             return v;
         }
-
-        static void BounceBack(int px, int py)
+        static void BounceBack(int px, int py, double densityWall, double uWallx, double uWally,double uWallxm, double uWallym)
         {
-                if (Lattices[px - 1, py].IsWall) //left
+            double ux = 0;
+            double uy = 0;
+            double uxm = 0;
+            double uym = 0;
+            if (Lattices[px,py].IsMovingWall) 
+            {
+                ux = uWallx;
+                uy = uWally;
+                uxm = uWallxm;
+                uym = uWallym;
+            }
+
+            double[] latPosCol = new double[d2Q9.NumberOfSpeeds];
+
+            for (int k=0; k<9;k++) 
+            {
+                double omega = (Lattices[px, py].f[k] - Lattices[px, py].Equilibrium()[k]) / Lattices[px, py].RelaxTime;
+                latPosCol[k] = Lattices[px, py].f[k] - omega;
+            }
+            if (Lattices[px, py].IsWall) //left
                 {
-                    Lattices[px, py].f[8] = Lattices[px, py].f_post[6];
-                    Lattices[px, py].f[5] = Lattices[px, py].f_post[7];
-                    Lattices[px, py].f[1] = Lattices[px, py].f_post[3];
+                    Lattices[px, py].f[8] = latPosCol[6] - 2 * d2Q9.WeightsOfEDFs[8] * densityWall * d2Q9.InicialSpeedX[8] * ux / d2Q9.SoundSpeedPowerTwo;
+                    Lattices[px, py].f[5] = latPosCol[7] - 2 * d2Q9.WeightsOfEDFs[5] * densityWall * d2Q9.InicialSpeedX[5] * ux / d2Q9.SoundSpeedPowerTwo;
+                    Lattices[px, py].f[1] = latPosCol[3] - 2 * d2Q9.WeightsOfEDFs[1] * densityWall * d2Q9.InicialSpeedX[1] * ux / d2Q9.SoundSpeedPowerTwo;
                 }
                 if (Lattices[px, py + 1].IsWall) //up
                 {
-                    Lattices[px, py].f[7] = Lattices[px, py].f_post[5];
-                    Lattices[px, py].f[4] = Lattices[px, py].f_post[2];
-                    Lattices[px, py].f[8] = Lattices[px, py].f_post[6];
+                    Lattices[px, py].f[7] = latPosCol[5] - 2 * d2Q9.WeightsOfEDFs[7] * densityWall * d2Q9.InicialSpeedX[7] * uy / d2Q9.SoundSpeedPowerTwo;
+                    Lattices[px, py].f[4] = latPosCol[2] - 2 * d2Q9.WeightsOfEDFs[4] * densityWall * d2Q9.InicialSpeedX[4] * uy / d2Q9.SoundSpeedPowerTwo;
+                    Lattices[px, py].f[8] = latPosCol[6] - 2 * d2Q9.WeightsOfEDFs[8] * densityWall * d2Q9.InicialSpeedX[8] * uy / d2Q9.SoundSpeedPowerTwo;
                 }
                 if (Lattices[px + 1, py].IsWall) //right
                 {
-                    Lattices[px, py].f[6] = Lattices[px, py].f_post[8];
-                    Lattices[px, py].f[3] = Lattices[px, py].f_post[1];
-                    Lattices[px, py].f[7] = Lattices[px, py].f_post[5];
+                    Lattices[px, py].f[6] = latPosCol[8] - 2 * d2Q9.WeightsOfEDFs[6] * densityWall * d2Q9.InicialSpeedX[6] * uxm / d2Q9.SoundSpeedPowerTwo;
+                    Lattices[px, py].f[3] = latPosCol[1] - 2 * d2Q9.WeightsOfEDFs[3] * densityWall * d2Q9.InicialSpeedX[3] * uxm / d2Q9.SoundSpeedPowerTwo;
+                    Lattices[px, py].f[7] = latPosCol[5] - 2 * d2Q9.WeightsOfEDFs[7] * densityWall * d2Q9.InicialSpeedX[7] * uxm / d2Q9.SoundSpeedPowerTwo;
                 }
                 if (Lattices[px, py - 1].IsWall) //down
                 {
-                    Lattices[px, py].f[6] = Lattices[px, py].f_post[8];
-                    Lattices[px, py].f[2] = Lattices[px, py].f_post[4];
-                    Lattices[px, py].f[5] = Lattices[px, py].f_post[7];
+                    Lattices[px, py].f[6] = latPosCol[8] - 2 * d2Q9.WeightsOfEDFs[8] * densityWall * d2Q9.InicialSpeedX[8] * uym / d2Q9.SoundSpeedPowerTwo;
+                    Lattices[px, py].f[2] = latPosCol[4] - 2 * d2Q9.WeightsOfEDFs[2] * densityWall * d2Q9.InicialSpeedX[2] * uym / d2Q9.SoundSpeedPowerTwo;
+                    Lattices[px, py].f[5] = latPosCol[7] - 2 * d2Q9.WeightsOfEDFs[5] * densityWall * d2Q9.InicialSpeedX[5] * uym / d2Q9.SoundSpeedPowerTwo;
                 }
+                
         }
-        static void InflowAndOuflow(int px, int py, double densityWall,double uWallX) 
+        static void InflowAndOuflow(int px, int py, double densityWall) 
         {
-            //double densityWall = 1;
-            //double uWallX = 0.1;
-            if (Lattices[px, py].IsMovingWall) //left //post?
-            {
-                //Lattices[px, py].f[8] = Lattices[px, py].f_post[6] - 2 * d2Q9.WeightsOfEDFs[8] * densityWall * d2Q9.InicialSpeedX[8] * uWallX / d2Q9.SoundSpeedPowerTwo;
-                Lattices[px, py].f[8] = Lattices[px, py].f_post[6];
-                //Lattices[px, py].f[5] = Lattices[px, py].f_post[7] - 2 * d2Q9.WeightsOfEDFs[5] * densityWall * d2Q9.InicialSpeedX[5] * uWallX / d2Q9.SoundSpeedPowerTwo;
-                Lattices[px, py].f[5] = Lattices[px, py].f_post[7];
-
-                Lattices[px, py].f_post[1] = Lattices[px, py].f_post[3] - 2 * d2Q9.WeightsOfEDFs[1] * densityWall * d2Q9.InicialSpeedX[1] * uWallX / d2Q9.SoundSpeedPowerTwo;
-                // for first task left wall is enough 
-            }
             //pressure outlow Zao 2.79 -2.82
             if (Lattices[px, py].IsPressureOutFlow)
             {
@@ -300,6 +307,7 @@ namespace BachBoltzman
                     if (ix == 0 && iy !=0 && iy != Lattices.GetLength(1))
                     {
                         Lattices[ix, iy].IsMovingWall = true;
+                        Lattices[ix, iy].IsWall = true;
                     }
                     if (ix == Lattices.GetLength(0) && iy != 0 && iy != Lattices.GetLength(1))
                     {
@@ -348,14 +356,14 @@ namespace BachBoltzman
                             {
                                 if (Lattices[j, i].IsWall == false && j != 0 && j != x - 1)
                                 {
-                                    BounceBack(j, i);
+                                    BounceBack(j, i, 1,0.1,0.0,0.0,0.0); //zatim na pevno po testech se dat do vstupu tridy
                                 }
                             }
                         }
                     }
                     if (Lattices[j,i].IsMovingWall || Lattices[j,i].IsPressureOutFlow)
                     {
-                        InflowAndOuflow(j, i, 1,0.1);
+                        InflowAndOuflow(j, i, 1);// bez v, neresi stenu
                     }
                 }
             }
@@ -377,7 +385,7 @@ namespace BachBoltzman
                             Lattices[ix, iy].f_post[k] = Lattices[ix, iy].f[k] - omega;
                             if (Lattices[ix,iy].Density > 1.1) 
                             {
-                                Console.WriteLine("bad");
+                                Console.WriteLine("bad");//vim  ze nemam konzolu je tu jen pro breakpoint
                             }
                         }
                     }

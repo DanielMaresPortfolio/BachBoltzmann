@@ -206,7 +206,6 @@ namespace BachBoltzman
                         uy = (f[5] + f[6] + f[2] - f[7] - f[8] - f[4]) / Density;
                         break;
                 }
-
                 return uy;
             }
         }
@@ -218,7 +217,7 @@ namespace BachBoltzman
             for (int i = 0; i < d2Q9.InicialSpeedX.Length; i++)
             {
                 cu[i] = d2Q9.InicialSpeedX[i] * this.SpeedInX + d2Q9.InicialSpeedY[i] * this.SpeedInY;
-                v[i] = d2Q9.WeightsOfEDFs[i] * this.Density * (1 + 3 * cu[i] + 4.5 * cu[i] * cu[i] - 1.5 * (this.SpeedInX * this.SpeedInX + this.SpeedInY * this.SpeedInY));
+                v[i] = d2Q9.WeightsOfEDFs[i] * this.Density * (1 + 3 * cu[i] + 4.5 * cu[i] * cu[i] - 1.5 * (this.SpeedInX * this.SpeedInX + this.SpeedInY * this.SpeedInY)); //vyjádřeno pro d2q9 (cs 2 = 1/3)
             }
             return v;
         }
@@ -356,7 +355,7 @@ namespace BachBoltzman
                         id = i - d2Q9.InicialSpeedY[k];
                         if (jd >= 0 && jd < x && id >= 0 && id < y)
                         {
-                            if (Lattices[jd, id].IsWall == false)
+                            if (Lattices[jd, id].IsWall == false && Lattices[j, i].IsWall == false)
                             {
                                 Lattices[j, i].f[k] = Lattices[jd, id].f_post[k];
                             }
@@ -412,9 +411,8 @@ namespace BachBoltzman
                     }
                 }
             }
-
         }
-        public void Run(int timeCykle, int timeSnap, double inicialSpeedInX, double inicialSpeedInY, double inicialViskozkozity, bool[,] layout)
+        static public void Run(int timeCykle, int timeSnap, double inicialSpeedInX, double inicialSpeedInY, double inicialViskozkozity, bool[,] layout)
         {
             int x = Lattices.GetLength(0);
             int y = Lattices.GetLength(1);
@@ -428,6 +426,8 @@ namespace BachBoltzman
             //List<string> DensityText = new List<string>();
             for (int t = 0; t <= timeCykle; t++)
             {
+                CollideBGK();
+                Stream();
                 if (t % timeSnap == 0)
                 {
                     for (int px = 0; px < x; px++)
@@ -437,6 +437,11 @@ namespace BachBoltzman
                             OutputSpeeds[px, py, i] = Math.Sqrt(Math.Pow(Lattices[px, py].SpeedInX, 2) + Math.Pow(Lattices[px, py].SpeedInY, 2));
                             OutputDensity[px, py, i] = Lattices[px, py].Density;
                             //densityLine +=(" {0: F10}", Lattices[px, py].Density);
+
+                            if (px==1&&py==1) 
+                            {
+                                Console.WriteLine("bad");//vim  ze nemam konzolu je tu jen pro breakpoint
+                            }
                         }
                        // DensityText.Add("---------------------");
                         //DensityText.Add(densityLine);
@@ -451,8 +456,6 @@ namespace BachBoltzman
                     //    }
                     //}
                 }
-                CollideBGK();
-                Stream();
             }
         }
     }

@@ -26,8 +26,10 @@ namespace BachBoltyman
     /// </summary>
     public partial class Results : Window, INotifyPropertyChanged
     {
-        public Results(double[,,] speedMap_, double[,,] densityMap_, int[] alltime_) //zkusit ref na Lattice v App
+        private Lattice lattice;
+        public Results(double[,,] speedMap_, double[,,] densityMap_, int[] alltime_, ref Lattice lattice_) //zkusit ref na Lattice v App
         {
+            lattice = lattice_;
             SpeedMap = speedMap_;
             DensityMap = densityMap_;
             AllTime = alltime_;
@@ -48,6 +50,7 @@ namespace BachBoltyman
         }
         public void DrawOutput(double[,,] map, int index)
         {
+            
             Heatmap.Width = SpeedMap.GetLength(0);
             Heatmap.Height = SpeedMap.GetLength(1);
             int width = Convert.ToInt32(Heatmap.Width);

@@ -19,8 +19,8 @@ namespace BachBoltzman
     }
     public class InicLayout
     {
-        private int sx = 200; //500
-        private int sy = 100; //200
+        private int sx = 50; //250
+        private int sy = 20; //100
         public int SizeX { get => sx; set => sx = value; }
         public int SizeY { get => sy; set => sy = value; }
         public bool[,] MyLayout { get; set; }
@@ -188,7 +188,7 @@ namespace BachBoltzman
                 switch (d2Q9.NumberOfSpeeds)
                 {
                     case 9:
-                        ux = (f[1] + f[5] + f[8] - f[3] - f[6] - f[2]) / Density;
+                        ux = (f[1] + f[5] + f[8] - f[3] - f[6] - f[7]) / Density;
                         break;
                 }
 
@@ -392,7 +392,8 @@ namespace BachBoltzman
                         {
                             double omega = (Lattices[ix, iy].f[k] - Lattices[ix, iy].Equilibrium()[k]) / Lattices[ix, iy].RelaxTime;
                             Lattices[ix, iy].f_post[k] = Lattices[ix, iy].f[k] - omega;
-                            if (Lattices[ix, iy].Density > 1.1)
+
+                            if (Lattices[ix, iy].Density > 1.5)
                             {
                                 Console.WriteLine("bad");//vim  ze nemam konzolu je tu jen pro breakpoint
                             }
@@ -419,7 +420,7 @@ namespace BachBoltzman
 
             OutputSpeeds = new double[x,y,Convert.ToInt32((timeCykle / timeSnap) + 1)];
             OutputDensity = new double[x, y, Convert.ToInt32((timeCykle / timeSnap) +  1)];
-            InitializeLayout(layout, [0, 0.1, 0, 0, 0, 0.1, 0, 0, 0.1]);
+            InitializeLayout(layout, [0, 0.1, 0, 0, 0, 0, 0, 0, 0.1]);//0, 0.1, 0, 0, 0, 0.1, 0, 0, 0.1
             InitializeEquilibrium(inicialSpeedInX, inicialSpeedInY,inicialViskozkozity);
             int i = 0;
             //string densityLine = null;
@@ -440,7 +441,7 @@ namespace BachBoltzman
 
                             if (px==1&&py==1) 
                             {
-                                Console.WriteLine("bad");//vim  ze nemam konzolu je tu jen pro breakpoint
+                                Console.WriteLine("test");//vim  ze nemam konzolu je tu jen pro breakpoint
                             }
                         }
                        // DensityText.Add("---------------------");

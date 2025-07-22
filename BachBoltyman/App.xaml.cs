@@ -218,7 +218,7 @@ namespace BachBoltzman
             for (int i = 0; i < d2Q9.InicialSpeedX.Length; i++)
             {
                 cu[i] = d2Q9.InicialSpeedX[i] * this.SpeedInX + d2Q9.InicialSpeedY[i] * this.SpeedInY;
-                v[i] = d2Q9.WeightsOfEDFs[i] * this.Density * (1 + 3 * cu[i] + 4.5 * cu[i] * cu[i] - 1.5 * (this.SpeedInX * this.SpeedInX + this.SpeedInY * this.SpeedInY)); //vyjádřeno pro d2q9 (cs 2 = 1/3)
+                v[i] = d2Q9.WeightsOfEDFs[i] * this.Density * (1 + 3 * cu[i] + 4.5 * cu[i] * cu[i] - 1.5 * (this.SpeedInX * this.SpeedInX) + (this.SpeedInY * this.SpeedInY)); //vyjádřeno pro d2q9 (cs 2 = 1/3)
             }
             return v;
         }
@@ -227,10 +227,10 @@ namespace BachBoltzman
             double[] v = new double[d2Q9.NumberOfSpeeds];
             double[] cu = new double[d2Q9.NumberOfSpeeds];
             double inicDensity = 1;
-            for (int i = 0; i < d2Q9.InicialSpeedX.Length; i++)
+            for (int i = 0; i < d2Q9.NumberOfSpeeds; i++)
             {
                 cu[i] = d2Q9.InicialSpeedX[i] * inSpeedInX + d2Q9.InicialSpeedY[i] * inSpeedInY;
-                v[i] = d2Q9.WeightsOfEDFs[i] * inicDensity * (1 + 3 * cu[i] + 4.5 * cu[i] * cu[i] - 1.5 * (inSpeedInX * inSpeedInX + inSpeedInY * inSpeedInY));
+                v[i] = d2Q9.WeightsOfEDFs[i] * inicDensity * (1 + 3 * cu[i] + 4.5 * cu[i] * cu[i] - 1.5 * (inSpeedInX * inSpeedInX) + (inSpeedInY * inSpeedInY));
             }
             return v;
         }
@@ -247,43 +247,43 @@ namespace BachBoltzman
             }
                 if (sx==-1 && sy==0) //left
                 {
-                    Lattices[px, py].f[8] = latPosCol[6] - 2 * d2Q9.WeightsOfEDFs[8] * densityWall * d2Q9.InicialSpeedX[8] * Lattices[px,py].WallSpeeds[8] / d2Q9.SoundSpeedPowerTwo;
-                    Lattices[px, py].f[5] = latPosCol[7] - 2 * d2Q9.WeightsOfEDFs[5] * densityWall * d2Q9.InicialSpeedX[5] * Lattices[px, py].WallSpeeds[5] / d2Q9.SoundSpeedPowerTwo;
-                    Lattices[px, py].f[1] = latPosCol[3] - 2 * d2Q9.WeightsOfEDFs[1] * densityWall * d2Q9.InicialSpeedX[1] * Lattices[px, py].WallSpeeds[1] / d2Q9.SoundSpeedPowerTwo;
+                    Lattices[px, py].f[8] = latPosCol[6] - 2 * d2Q9.WeightsOfEDFs[8] * densityWall * d2Q9.InicialSpeedX[8] * Lattices[px,py].WallSpeeds[8] / 1;
+                    Lattices[px, py].f[5] = latPosCol[7] - 2 * d2Q9.WeightsOfEDFs[5] * densityWall * d2Q9.InicialSpeedX[5] * Lattices[px, py].WallSpeeds[5] / 1;
+                    Lattices[px, py].f[1] = latPosCol[3] - 2 * d2Q9.WeightsOfEDFs[1] * densityWall * d2Q9.InicialSpeedX[1] * Lattices[px, py].WallSpeeds[1] / 1;
                 }
                 if (sx == 0 && sy == 1) //up
                 {
-                    Lattices[px, py].f[7] = latPosCol[5] - 2 * d2Q9.WeightsOfEDFs[7] * densityWall * d2Q9.InicialSpeedX[7] * Lattices[px, py].WallSpeeds[5] / d2Q9.SoundSpeedPowerTwo;
-                    Lattices[px, py].f[4] = latPosCol[2] - 2 * d2Q9.WeightsOfEDFs[4] * densityWall * d2Q9.InicialSpeedX[4] * Lattices[px, py].WallSpeeds[4] / d2Q9.SoundSpeedPowerTwo;
-                    Lattices[px, py].f[8] = latPosCol[6] - 2 * d2Q9.WeightsOfEDFs[8] * densityWall * d2Q9.InicialSpeedX[8] * Lattices[px, py].WallSpeeds[8] / d2Q9.SoundSpeedPowerTwo;
+                    Lattices[px, py].f[7] = latPosCol[5] - 2 * d2Q9.WeightsOfEDFs[7] * densityWall * d2Q9.InicialSpeedX[7] * Lattices[px, py].WallSpeeds[5] / 1;
+                    Lattices[px, py].f[4] = latPosCol[2] - 2 * d2Q9.WeightsOfEDFs[4] * densityWall * d2Q9.InicialSpeedX[4] * Lattices[px, py].WallSpeeds[4] / 1;
+                    Lattices[px, py].f[8] = latPosCol[6] - 2 * d2Q9.WeightsOfEDFs[8] * densityWall * d2Q9.InicialSpeedX[8] * Lattices[px, py].WallSpeeds[8] / 1;
                 }
                 if (sx == 1 && sy == 0) //right
                 {
-                    Lattices[px, py].f[6] = latPosCol[8] - 2 * d2Q9.WeightsOfEDFs[6] * densityWall * d2Q9.InicialSpeedX[6] * Lattices[px, py].WallSpeeds[8] / d2Q9.SoundSpeedPowerTwo;
-                    Lattices[px, py].f[3] = latPosCol[1] - 2 * d2Q9.WeightsOfEDFs[3] * densityWall * d2Q9.InicialSpeedX[3] * Lattices[px, py].WallSpeeds[1] / d2Q9.SoundSpeedPowerTwo;
-                    Lattices[px, py].f[7] = latPosCol[5] - 2 * d2Q9.WeightsOfEDFs[7] * densityWall * d2Q9.InicialSpeedX[7] * Lattices[px, py].WallSpeeds[5] / d2Q9.SoundSpeedPowerTwo;
+                    Lattices[px, py].f[6] = latPosCol[8] - 2 * d2Q9.WeightsOfEDFs[6] * densityWall * d2Q9.InicialSpeedX[6] * Lattices[px, py].WallSpeeds[8] / 1;
+                    Lattices[px, py].f[3] = latPosCol[1] - 2 * d2Q9.WeightsOfEDFs[3] * densityWall * d2Q9.InicialSpeedX[3] * Lattices[px, py].WallSpeeds[1] / 1;
+                    Lattices[px, py].f[7] = latPosCol[5] - 2 * d2Q9.WeightsOfEDFs[7] * densityWall * d2Q9.InicialSpeedX[7] * Lattices[px, py].WallSpeeds[5] / 1;
                 }
                 if (sx == 0 && sy == -1) //down
                 {
-                    Lattices[px, py].f[6] = latPosCol[8] - 2 * d2Q9.WeightsOfEDFs[8] * densityWall * d2Q9.InicialSpeedX[8] * Lattices[px, py].WallSpeeds[6] / d2Q9.SoundSpeedPowerTwo;
-                    Lattices[px, py].f[2] = latPosCol[4] - 2 * d2Q9.WeightsOfEDFs[2] * densityWall * d2Q9.InicialSpeedX[2] * Lattices[px, py].WallSpeeds[2] / d2Q9.SoundSpeedPowerTwo;
-                    Lattices[px, py].f[5] = latPosCol[7] - 2 * d2Q9.WeightsOfEDFs[5] * densityWall * d2Q9.InicialSpeedX[5] * Lattices[px, py].WallSpeeds[5] / d2Q9.SoundSpeedPowerTwo;
+                    Lattices[px, py].f[6] = latPosCol[8] - 2 * d2Q9.WeightsOfEDFs[8] * densityWall * d2Q9.InicialSpeedX[8] * Lattices[px, py].WallSpeeds[6] / 1;
+                    Lattices[px, py].f[2] = latPosCol[4] - 2 * d2Q9.WeightsOfEDFs[2] * densityWall * d2Q9.InicialSpeedX[2] * Lattices[px, py].WallSpeeds[2] / 1;
+                    Lattices[px, py].f[5] = latPosCol[7] - 2 * d2Q9.WeightsOfEDFs[5] * densityWall * d2Q9.InicialSpeedX[5] * Lattices[px, py].WallSpeeds[5] / 1;
                 }
                 if (sx == -1 && sy == 1) //left upper diagonal
                 {
-                Lattices[px, py].f[8] = latPosCol[6] - 2 * d2Q9.WeightsOfEDFs[8] * densityWall * d2Q9.InicialSpeedX[8] * Lattices[px, py].WallSpeeds[8] / d2Q9.SoundSpeedPowerTwo;
+                Lattices[px, py].f[8] = latPosCol[6] - 2 * d2Q9.WeightsOfEDFs[8] * densityWall * d2Q9.InicialSpeedX[8] * Lattices[px, py].WallSpeeds[8] / 1;
                 }
                 if (sx == -1 && sy == -1) //left lower diagonal
                 {
-                    Lattices[px, py].f[5] = latPosCol[7] - 2 * d2Q9.WeightsOfEDFs[5] * densityWall * d2Q9.InicialSpeedX[5] * Lattices[px, py].WallSpeeds[5] / d2Q9.SoundSpeedPowerTwo;
+                    Lattices[px, py].f[5] = latPosCol[7] - 2 * d2Q9.WeightsOfEDFs[5] * densityWall * d2Q9.InicialSpeedX[5] * Lattices[px, py].WallSpeeds[5] / 1;
                 }
                 if (sx == 1 && sy == 1) //rigt upper diagonal
                 {
-                     Lattices[px, py].f[7] = latPosCol[5] - 2 * d2Q9.WeightsOfEDFs[7] * densityWall * d2Q9.InicialSpeedX[7] * Lattices[px, py].WallSpeeds[5] / d2Q9.SoundSpeedPowerTwo;
+                     Lattices[px, py].f[7] = latPosCol[5] - 2 * d2Q9.WeightsOfEDFs[7] * densityWall * d2Q9.InicialSpeedX[7] * Lattices[px, py].WallSpeeds[5] / 1;
                 }
                 if (sx == 1 && sy == -1) //right lower diagonal
                 {
-                    Lattices[px, py].f[6] = latPosCol[8] - 2 * d2Q9.WeightsOfEDFs[6] * densityWall * d2Q9.InicialSpeedX[6] * Lattices[px, py].WallSpeeds[8] / d2Q9.SoundSpeedPowerTwo;
+                    Lattices[px, py].f[6] = latPosCol[8] - 2 * d2Q9.WeightsOfEDFs[6] * densityWall * d2Q9.InicialSpeedX[6] * Lattices[px, py].WallSpeeds[8] / 1;
                 }
         }
         static void InflowAndOuflow(int px, int py, double densityWall) 

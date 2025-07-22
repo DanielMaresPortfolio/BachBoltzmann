@@ -46,7 +46,7 @@ namespace BachBoltyman
         }
         public void DrawOutputDensity(double[,,] map, int index)
         {
-            double v = Lattice.Lattices[1, 1].Viskozity;
+            double v = Lattice.Lattices[1, 1].Viskozity; //abych se koukl do Lattices
 
             Heatmap.Width = Lattice.OutputDensity.GetLength(0);
             Heatmap.Height = Lattice.OutputDensity.GetLength(1);
@@ -84,7 +84,7 @@ namespace BachBoltyman
                 for (int iy = 0; iy < height; iy++) 
                 {
                     int i = width * iy + ix;
-                    uint grad = Convert.ToUInt32(((maxValueMap - mapInTime[ix, iy]) / (maxValueMap - minValueMap))*255); //příliš malé rozdíly
+                    uint grad = Convert.ToUInt32((Math.Round((decimal) maxValueMap, 5) - Math.Round((decimal)mapInTime[ix, iy],5)) / (Math.Round((decimal)maxValueMap,5) - (Math.Round((decimal)minValueMap,5)))*255); //příliš malé rozdíly
                     switch (mapInTime[ix, iy])//colours cs^2 = 1/3 -> 0:0.577 
                     {
                         // spatne barvy << je byte posuv | RGB

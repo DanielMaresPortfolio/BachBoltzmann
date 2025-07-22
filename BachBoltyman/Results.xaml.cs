@@ -27,11 +27,9 @@ namespace BachBoltyman
     public partial class Results : Window, INotifyPropertyChanged
     {
         private Lattice lattice;
-        public Results(double[,,] speedMap_, double[,,] densityMap_, int[] alltime_, ref Lattice lattice_) //zkusit ref na Lattice v App
+        public Results(int[] alltime_, ref Lattice lattice_) //zkusit ref na Lattice v App
         {
             lattice = lattice_;
-            SpeedMap = speedMap_;
-            DensityMap = densityMap_;
             AllTime = alltime_;
             DataContext = this;
             InitializeComponent();
@@ -40,24 +38,26 @@ namespace BachBoltyman
         private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
-            DrawOutput(DensityMap, TimeSelect.SelectedIndex);
+            DrawOutputDensity(Lattice.OutputDensity, TimeSelect.SelectedIndex);
         }
-        public double[,,] SpeedMap { get; set; }
-        public double[,,] DensityMap { get; set; }
         public int[] AllTime
         {
             get; set;
         }
-        public void DrawOutput(double[,,] map, int index)
+        public void DrawOutputDensity(double[,,] map, int index)
         {
-            
-            Heatmap.Width = SpeedMap.GetLength(0);
-            Heatmap.Height = SpeedMap.GetLength(1);
+            double v = Lattice.Lattices[1, 1].Viskozity;
+
+            Heatmap.Width = Lattice.OutputDensity.GetLength(0);
+            Heatmap.Height = Lattice.OutputDensity.GetLength(1);
             int width = Convert.ToInt32(Heatmap.Width);
             int height = Convert.ToInt32(Heatmap.Height);
             WriteableBitmap bitmap = new WriteableBitmap(width, height, 96, 96, PixelFormats.Bgra32, null); //zdroj https://learn.microsoft.com/en-us/dotnet/api/system.windows.media.imaging.writeablebitmap?view=windowsdesktop-9.0&redirectedfrom=MSDN
             uint[] pixels = new uint[width * height];
             double[,] mapInTime = new double[map.GetLength(0), map.GetLength(1)];
+
+            double maxValueMap = 0;
+            double minValueMap = 2;
             //
 
             for (int ix = 0; ix < width; ix++)
@@ -65,12 +65,16 @@ namespace BachBoltyman
                 for (int iy = 0; iy < height; iy++)
                 {
                     mapInTime[ix, iy] = map[ix, iy, index];
+                    if (mapInTime[ix, iy] < minValueMap && mapInTime[ix, iy] >= 0)
+                    {
+                        minValueMap = mapInTime[ix, iy];
+                    }
+                    if (mapInTime[ix, iy] > maxValueMap && mapInTime[ix, iy] >= 0)
+                    {
+                        maxValueMap = mapInTime[ix, iy];
+                    }
                 }
             }
-            //
-            double maxValueMap = (from double d in mapInTime select d).Max();
-            double minValueMap = (from double d in mapInTime select d).Min();
-
             //Console.WriteLine("Max hodnota" + "{0: F20}", maxValueMap);
             //Console.WriteLine("Min hodnota" + "{0: F20}", minValueMap);
 

@@ -2,6 +2,7 @@
 using System.Data;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography.Xml;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Automation;
@@ -19,8 +20,8 @@ namespace BachBoltzman
     }
     public class InicLayout
     {
-        private int sx = 50; //250
-        private int sy = 20; //100
+        private int sx = 100; //250
+        private int sy = 40; //100
         public int SizeX { get => sx; set => sx = value; }
         public int SizeY { get => sy; set => sy = value; }
         public bool[,] MyLayout { get; set; }
@@ -235,6 +236,8 @@ namespace BachBoltzman
         }
         static void BounceBack(int px, int py, int tx, int ty, double densityWall)
         {
+            int sx = px-tx;
+            int sy = py-ty;
             double[] latPosCol = new double[d2Q9.NumberOfSpeeds];
 
             for (int k=0; k<9;k++) 
@@ -242,43 +245,43 @@ namespace BachBoltzman
                 double omega = (Lattices[px, py].f[k] - Lattices[px, py].Equilibrium()[k]) / Lattices[px, py].RelaxTime;
                 latPosCol[k] = Lattices[px, py].f[k] - omega;
             }
-                if (tx==-1 && ty==0) //left
+                if (sx==-1 && sy==0) //left
                 {
                     Lattices[px, py].f[8] = latPosCol[6] - 2 * d2Q9.WeightsOfEDFs[8] * densityWall * d2Q9.InicialSpeedX[8] * Lattices[px,py].WallSpeeds[8] / d2Q9.SoundSpeedPowerTwo;
                     Lattices[px, py].f[5] = latPosCol[7] - 2 * d2Q9.WeightsOfEDFs[5] * densityWall * d2Q9.InicialSpeedX[5] * Lattices[px, py].WallSpeeds[5] / d2Q9.SoundSpeedPowerTwo;
                     Lattices[px, py].f[1] = latPosCol[3] - 2 * d2Q9.WeightsOfEDFs[1] * densityWall * d2Q9.InicialSpeedX[1] * Lattices[px, py].WallSpeeds[1] / d2Q9.SoundSpeedPowerTwo;
                 }
-                if (tx == 0 && ty == 1) //up
+                if (sx == 0 && sy == 1) //up
                 {
                     Lattices[px, py].f[7] = latPosCol[5] - 2 * d2Q9.WeightsOfEDFs[7] * densityWall * d2Q9.InicialSpeedX[7] * Lattices[px, py].WallSpeeds[5] / d2Q9.SoundSpeedPowerTwo;
                     Lattices[px, py].f[4] = latPosCol[2] - 2 * d2Q9.WeightsOfEDFs[4] * densityWall * d2Q9.InicialSpeedX[4] * Lattices[px, py].WallSpeeds[4] / d2Q9.SoundSpeedPowerTwo;
                     Lattices[px, py].f[8] = latPosCol[6] - 2 * d2Q9.WeightsOfEDFs[8] * densityWall * d2Q9.InicialSpeedX[8] * Lattices[px, py].WallSpeeds[8] / d2Q9.SoundSpeedPowerTwo;
                 }
-                if (tx == 1 && ty == 0) //right
+                if (sx == 1 && sy == 0) //right
                 {
                     Lattices[px, py].f[6] = latPosCol[8] - 2 * d2Q9.WeightsOfEDFs[6] * densityWall * d2Q9.InicialSpeedX[6] * Lattices[px, py].WallSpeeds[8] / d2Q9.SoundSpeedPowerTwo;
                     Lattices[px, py].f[3] = latPosCol[1] - 2 * d2Q9.WeightsOfEDFs[3] * densityWall * d2Q9.InicialSpeedX[3] * Lattices[px, py].WallSpeeds[1] / d2Q9.SoundSpeedPowerTwo;
                     Lattices[px, py].f[7] = latPosCol[5] - 2 * d2Q9.WeightsOfEDFs[7] * densityWall * d2Q9.InicialSpeedX[7] * Lattices[px, py].WallSpeeds[5] / d2Q9.SoundSpeedPowerTwo;
                 }
-                if (tx == 0 && ty == -1) //down
+                if (sx == 0 && sy == -1) //down
                 {
                     Lattices[px, py].f[6] = latPosCol[8] - 2 * d2Q9.WeightsOfEDFs[8] * densityWall * d2Q9.InicialSpeedX[8] * Lattices[px, py].WallSpeeds[6] / d2Q9.SoundSpeedPowerTwo;
                     Lattices[px, py].f[2] = latPosCol[4] - 2 * d2Q9.WeightsOfEDFs[2] * densityWall * d2Q9.InicialSpeedX[2] * Lattices[px, py].WallSpeeds[2] / d2Q9.SoundSpeedPowerTwo;
                     Lattices[px, py].f[5] = latPosCol[7] - 2 * d2Q9.WeightsOfEDFs[5] * densityWall * d2Q9.InicialSpeedX[5] * Lattices[px, py].WallSpeeds[5] / d2Q9.SoundSpeedPowerTwo;
                 }
-                if (tx == -1 && ty == 1) //left upper diagonal
+                if (sx == -1 && sy == 1) //left upper diagonal
                 {
                 Lattices[px, py].f[8] = latPosCol[6] - 2 * d2Q9.WeightsOfEDFs[8] * densityWall * d2Q9.InicialSpeedX[8] * Lattices[px, py].WallSpeeds[8] / d2Q9.SoundSpeedPowerTwo;
                 }
-                if (tx == -1 && ty == -1) //left lower diagonal
+                if (sx == -1 && sy == -1) //left lower diagonal
                 {
                     Lattices[px, py].f[5] = latPosCol[7] - 2 * d2Q9.WeightsOfEDFs[5] * densityWall * d2Q9.InicialSpeedX[5] * Lattices[px, py].WallSpeeds[5] / d2Q9.SoundSpeedPowerTwo;
                 }
-                if (tx == 1 && ty == 1) //rigt upper diagonal
+                if (sx == 1 && sy == 1) //rigt upper diagonal
                 {
                      Lattices[px, py].f[7] = latPosCol[5] - 2 * d2Q9.WeightsOfEDFs[7] * densityWall * d2Q9.InicialSpeedX[7] * Lattices[px, py].WallSpeeds[5] / d2Q9.SoundSpeedPowerTwo;
                 }
-                if (tx == 1 && ty == -1) //right lower diagonal
+                if (sx == 1 && sy == -1) //right lower diagonal
                 {
                     Lattices[px, py].f[6] = latPosCol[8] - 2 * d2Q9.WeightsOfEDFs[6] * densityWall * d2Q9.InicialSpeedX[6] * Lattices[px, py].WallSpeeds[8] / d2Q9.SoundSpeedPowerTwo;
                 }
@@ -420,7 +423,7 @@ namespace BachBoltzman
 
             OutputSpeeds = new double[x,y,Convert.ToInt32((timeCykle / timeSnap) + 1)];
             OutputDensity = new double[x, y, Convert.ToInt32((timeCykle / timeSnap) +  1)];
-            InitializeLayout(layout, [0, 0.1, 0, 0, 0, 0, 0, 0, 0.1]);//0, 0.1, 0, 0, 0, 0.1, 0, 0, 0.1
+            InitializeLayout(layout, [0, 0.5, 0, 0, 0, 0.5, 0, 0, 0.5]);//0, 0.1, 0, 0, 0, 0.1, 0, 0, 0.1
             InitializeEquilibrium(inicialSpeedInX, inicialSpeedInY,inicialViskozkozity);
             int i = 0;
             //string densityLine = null;
@@ -438,11 +441,6 @@ namespace BachBoltzman
                             OutputSpeeds[px, py, i] = Math.Sqrt(Math.Pow(Lattices[px, py].SpeedInX, 2) + Math.Pow(Lattices[px, py].SpeedInY, 2));
                             OutputDensity[px, py, i] = Lattices[px, py].Density;
                             //densityLine +=(" {0: F10}", Lattices[px, py].Density);
-
-                            if (px==1&&py==1) 
-                            {
-                                Console.WriteLine("test");//vim  ze nemam konzolu je tu jen pro breakpoint
-                            }
                         }
                        // DensityText.Add("---------------------");
                         //DensityText.Add(densityLine);

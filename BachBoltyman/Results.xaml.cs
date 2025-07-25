@@ -84,7 +84,7 @@ namespace BachBoltyman
                 for (int iy = 0; iy < height; iy++) 
                 {
                     int i = width * iy + ix;
-                    uint grad = Convert.ToUInt32((Math.Round((decimal) maxValueMap, 5) - Math.Round((decimal)mapInTime[ix, iy],5)) / (Math.Round((decimal)maxValueMap,5) - (Math.Round((decimal)minValueMap,5)))*255); //příliš malé rozdíly
+                    //uint grad = Convert.ToUInt32((Math.Round((decimal) maxValueMap, 5) - Math.Round((decimal)mapInTime[ix, iy],5)) / (Math.Round((decimal)maxValueMap,5) - (Math.Round((decimal)minValueMap,5)))*255); //příliš malé rozdíly
                     switch (mapInTime[ix, iy])//colours cs^2 = 1/3 -> 0:0.577 
                     {
                         // spatne barvy << je byte posuv | RGB
@@ -95,7 +95,7 @@ namespace BachBoltyman
                             pixels[i] = (uint)((Convert.ToUInt32(255) << 24) + (Convert.ToUInt32(0) << 16) + (Convert.ToUInt32(255) << 8) + Convert.ToUInt32(0)); 
                             break;
                         default:
-                            pixels[i] = (uint)((Convert.ToUInt32(255) << 24) + (Convert.ToUInt32(255) << 16) + (Convert.ToUInt32(grad*2/3) << 8) + Convert.ToUInt32(grad*1/3));
+                           // pixels[i] = (uint)((Convert.ToUInt32(255) << 24) + (Convert.ToUInt32(255) << 16) + (Convert.ToUInt32(grad*2/3) << 8) + Convert.ToUInt32(grad*1/3));
                             break;
                     }
                         bitmap.WritePixels(new Int32Rect(0, 0, width, height), pixels, width * 4, 0);

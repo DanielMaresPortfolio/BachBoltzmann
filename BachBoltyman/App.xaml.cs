@@ -49,7 +49,7 @@ namespace BachBoltzman
                     for (int y = 0; y < sy; y++)
                     {
                         testingLayout[x, y] = false;
-                        if (y == 0 || y == (sy - 1))
+                        if (y == 0 || y == (sy - 1) || x ==(sx-1)) //->  x ==(sx-1) stena na konci
                         {
                             testingLayout[x, y] = true;
                         }
@@ -118,7 +118,6 @@ namespace BachBoltzman
         public Lattice(int sizeX, int sizeY, double viscosity) //added this because i had problems with inicializing Lattices to max lenght
         {
             double vis = viscosity;
-
             Lattices = new Lattice[sizeX, sizeY];
         }
         public Lattice()
@@ -189,7 +188,7 @@ namespace BachBoltzman
                 switch (d2Q9.NumberOfSpeeds)
                 {
                     case 9:
-                        ux = (f[1] + f[5] + f[8] - f[3] - f[6] - f[7]) / Density;
+                        ux = (f[1] + f[5] + f[8] - f[3] - f[6] - f[7]) / this.Density;
                         break;
                 }
 
@@ -204,7 +203,7 @@ namespace BachBoltzman
                 switch (d2Q9.NumberOfSpeeds)
                 {
                     case 9:
-                        uy = (f[5] + f[6] + f[2] - f[7] - f[8] - f[4]) / Density;
+                        uy = (f[5] + f[6] + f[2] - f[7] - f[8] - f[4]) / this.Density;
                         break;
                 }
                 return uy;
@@ -230,36 +229,21 @@ namespace BachBoltzman
             for (int i = 0; i < d2Q9.NumberOfSpeeds; i++)
             {
                 cu[i] = d2Q9.InicialSpeedX[i] * inSpeedInX + d2Q9.InicialSpeedY[i] * inSpeedInY;
-                v[i] = d2Q9.WeightsOfEDFs[i] * inicDensity * (1 + 3 * cu[i] + 4.5 * cu[i] * cu[i] - 1.5 * (inSpeedInX * inSpeedInX) + (inSpeedInY * inSpeedInY));
+                v[i] = d2Q9.WeightsOfEDFs[i] * inicDensity * (1 + 3 * cu[i] + 4.5 * cu[i] * cu[i] - 1.5 * ((inSpeedInX * inSpeedInX) + (inSpeedInY * inSpeedInY)));
             }
             return v;
         }
         static void BounceBack(int px, int py, int tx, int ty, double densityWall)
         {
-            int sx = px-tx;
-            int sy = py-ty;
+            int sx = tx-px+1;
+            int sy = ty-py+1;
             double[] latPosCol = new double[d2Q9.NumberOfSpeeds];
-            int[,] zf = { { 7, 4, 8 }, 
-                         { 3, 0, 1 },   
-                         { 6, 2, 5 } };
-            //int[] nf = {0,1,2,3,4,5,6,7,8 };
+            int[,] zf = { { 6, 2, 5 }, 
+                         { 3, 0, 1 },
+                          { 7, 4, 8 }};
+            //int[] nf={0,1,2,3,4,5,6,7,8};
             int[] of = {0,3,4,1,2,7,8,5,6};
-
-            for (int k=0; k<9;k++) 
-            {
-                double omega = (Lattices[px, py].f[k] - Lattices[px, py].Equilibrium(px,py)[k]) / Lattices[px, py].RelaxTime;
-                latPosCol[k] = Lattices[px, py].f[k] - omega;
-            }
-            double podVstup=0.0;
-            foreach (double d in Lattices[tx,ty].WallSpeeds) 
-            {
-                podVstup =+ d;
-            }
-            if (podVstup != 0.0) 
-            {
-                Console.WriteLine(""); //nemam Consoli, jen breakpoint
-            }
-            Lattices[px, py].f[zf[sx+1,sy+1]] = latPosCol[zf[sx+ 1,sy+1]] - 2 * d2Q9.WeightsOfEDFs[of[zf[sx+1,sy+1]]] * densityWall * d2Q9.InicialSpeedX[of[zf[sx + 1, sy + 1]]] * Lattices[tx, ty].WallSpeeds[of[zf[sx+1,sy+1]]];
+            Lattices[px, py].f[zf[sx,sy]] = Lattices[px,py].f_post[of[zf[sx,sy]]] - 6 * d2Q9.WeightsOfEDFs[zf[sx,sy]] * densityWall * d2Q9.InicialSpeedX[zf[sx, sy]] * Lattices[tx,ty].WallSpeeds[of[zf[sx,sy]]];
         }
         static void PressureOuflow(int px, int py, double densityWall) 
         {
@@ -298,7 +282,7 @@ namespace BachBoltzman
                     }
                     if (ix == Lattices.GetLength(0)-1 && iy != 0 && iy != Lattices.GetLength(1)-1)
                     {
-                        Lattices[ix, iy].IsPressureOutFlow = true;
+                        //Lattices[ix, iy].IsPressureOutFlow = true;
                     }
                 }
             }
@@ -372,6 +356,7 @@ namespace BachBoltzman
                         {
                             double omega = (Lattices[ix,iy].f[k]-Lattices[ix, iy].Equilibrium(ix, iy)[k]) / Lattices[ix, iy].RelaxTime;
                             Lattices[ix, iy].f_post[k] = Lattices[ix, iy].f[k] - omega;
+
                             if (Lattices[ix, iy].Density > 1.5)
                             {
                                 Console.WriteLine("bad");//vim  ze nemam konzolu je tu jen pro breakpoint
@@ -399,7 +384,7 @@ namespace BachBoltzman
 
             OutputSpeeds = new double[x,y,Convert.ToInt32((timeCykle / timeSnap) + 1)];
             OutputDensity = new double[x, y, Convert.ToInt32((timeCykle / timeSnap) +  1)];
-            InitializeLayout(layout, [0.0, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]);//0, 0.1, 0, 0, 0, 0.1, 0, 0, 0.1
+            InitializeLayout(layout, [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]);//0, 0.1, 0, 0, 0, 0.1, 0, 0, 0.1
             InitializeEquilibrium(inicialSpeedInX, inicialSpeedInY,inicialViskozkozity);
             int i = 0;
             //string densityLine = null;

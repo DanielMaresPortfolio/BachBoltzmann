@@ -84,18 +84,18 @@ namespace BachBoltyman
                 for (int iy = 0; iy < height; iy++) 
                 {
                     int i = width * iy + ix;
-                    //uint grad = Convert.ToUInt32((Math.Round((decimal) maxValueMap, 5) - Math.Round((decimal)mapInTime[ix, iy],5)) / (Math.Round((decimal)maxValueMap,5) - (Math.Round((decimal)minValueMap,5)))*255); //příliš malé rozdíly
+                   uint grad = Convert.ToUInt32((Math.Round((decimal) maxValueMap, 5) - Math.Round((decimal)mapInTime[ix, iy],5)) / (Math.Round((decimal)maxValueMap,5) - (Math.Round((decimal)minValueMap,5)))*255); //příliš malé rozdíly
                     switch (mapInTime[ix, iy])//colours cs^2 = 1/3 -> 0:0.577 
                     {
                         // spatne barvy << je byte posuv | RGB
                         case -1:
                             pixels[i] = zc; //wall colour (pure black) //works for Density
                             break;
-                        case > 1.5:
-                            pixels[i] = (uint)((Convert.ToUInt32(255) << 24) + (Convert.ToUInt32(0) << 16) + (Convert.ToUInt32(255) << 8) + Convert.ToUInt32(0)); 
+                        case > 1.5: //Err
+                            pixels[i] = (uint)((Convert.ToUInt32(255) << 24) + (Convert.ToUInt32(0) << 16) + (Convert.ToUInt32(255) << 8) + Convert.ToUInt32(0)); //pure green
                             break;
                         default:
-                           // pixels[i] = (uint)((Convert.ToUInt32(255) << 24) + (Convert.ToUInt32(255) << 16) + (Convert.ToUInt32(grad*2/3) << 8) + Convert.ToUInt32(grad*1/3));
+                           pixels[i] = (uint)((Convert.ToUInt32(255) << 24) + (Convert.ToUInt32(125) << 16) + (Convert.ToUInt32(grad*2/3) << 8) + Convert.ToUInt32(grad*1/3));
                             break;
                     }
                         bitmap.WritePixels(new Int32Rect(0, 0, width, height), pixels, width * 4, 0);
@@ -149,7 +149,7 @@ namespace BachBoltyman
     //                        case -1:
     //                            pixels[i] = (uint)((255) + (0) + (0)); //wall colour (pure blue)
     //                            break;
-    //                        case > 0.577:
+    //                        case > 0.577: 
     //                            pixels[i] = (uint)((0) + (0) + (255)); //error colour (pure green)
     //                            break;
     //                        case double n when (n > 0 && n < 0.115):

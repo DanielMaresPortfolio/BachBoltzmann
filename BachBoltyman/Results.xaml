@@ -19,8 +19,10 @@
         <!-- big grid elements -->
         <ListBox x:Name="TimeSelect" SelectionChanged="ListBox_SelectionChanged" ItemsSource="{Binding AllTime}" />
         <Image x:Name="Heatmap" Grid.Column="1"/>
-        
-        <Grid Grid.Row="1" Grid.Column="1">
+        <Button Grid.Column="0" Grid.Row="1" Content="Update" Click="Button_Click"/>
+
+        <!-- finer elements -->
+            <Grid Grid.Row="1" Grid.Column="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*"/>
                 <ColumnDefinition Width="1*"/>
@@ -34,9 +36,24 @@
                 <RowDefinition Height="1*"/>
                 <RowDefinition Height="1*"/>
             </Grid.RowDefinitions>
-            <TextBox Grid.Row="0" Grid.Column="0" x:Name="ImputX"/>
-            <TextBox Grid.Row="1" Grid.Column="0" x:Name="ImputY"/>
-            
+               <!-- input place -->
+            <TextBox Grid.Row="0" Grid.Column="0" Text="{Binding InputX}"/>
+            <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding InputY}" />
+              <!-- output f, density and spead -->
+            <Label Grid.Row="0" Grid.Column="1" x:Name="F6"/>
+            <Label Grid.Row="0" Grid.Column="2" x:Name="F2"/>
+            <Label Grid.Row="0" Grid.Column="3" x:Name="F5"/>
+            <Label Grid.Row="1" Grid.Column="1" x:Name="F3"/>
+            <Label Grid.Row="1" Grid.Column="2" x:Name="F0"/>
+            <Label Grid.Row="1" Grid.Column="3" x:Name="F1"/>
+            <Label Grid.Row="2" Grid.Column="1" x:Name="F7"/>
+            <Label Grid.Row="2" Grid.Column="2" x:Name="F4"/>
+            <Label Grid.Row="2" Grid.Column="3" x:Name="F8"/>
+
+            <Label Grid.Row="0" Grid.Column="5" x:Name="Density"/>
+            <Label Grid.Row="1" Grid.Column="5" x:Name="SpeedInX"/>
+            <Label Grid.Row="3" Grid.Column="5" x:Name="SpeedInY"/>
         </Grid>
+
     </Grid>
 </Window>

@@ -38,16 +38,30 @@ namespace BachBoltyman
         private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
-            DrawOutputDensity(Lattice.OutputDensity, TimeSelect.SelectedIndex);
+            DrawOutputDensity(TimeSelect.SelectedIndex);
         }
         public int[] AllTime
         {
             get; set;
         }
-        public void DrawOutputDensity(double[,,] map, int index)
+        private int inputX = 0;
+        public int InputX
+        {
+            get => inputX;
+            set => inputX = value;
+        }
+        private int inputY = 0;
+        public int InputY
+        {
+            get => inputY;
+            set => inputY = value;
+        }
+
+        public void DrawOutputDensity(int index)
         {
             double v = Lattice.Lattices[1, 1].Viskozity; //abych se koukl do Lattices
 
+            double[,,] map = Lattice.OutputDensity;
             Heatmap.Width = Lattice.OutputDensity.GetLength(0);
             Heatmap.Height = Lattice.OutputDensity.GetLength(1);
             int width = Convert.ToInt32(Heatmap.Width);
@@ -105,6 +119,22 @@ namespace BachBoltyman
                         Heatmap.Source = bitmap;                    
                 }
             }
+        }
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            //F0.Content = Lattice.Lattices[inputX,inputY].DF[0]; //neukladam vsechny Lattice, moc velky
+            //F1.Content = Lattice.Lattices[inputX, inputY].DF[1];
+            //F2.Content = Lattice.Lattices[inputX, inputY].DF[2];
+            //F3.Content = Lattice.Lattices[inputX, inputY].DF[3];
+            //F4.Content = Lattice.Lattices[inputX, inputY].DF[4];
+            //F5.Content = Lattice.Lattices[inputX, inputY].DF[5];
+            //F6.Content = Lattice.Lattices[inputX, inputY].DF[6];
+            //F7.Content = Lattice.Lattices[inputX, inputY].DF[7];
+            //F8.Content = Lattice.Lattices[inputX, inputY].DF[8];
+
+            Density.Content = Lattice.OutputDensity[inputX,inputY, TimeSelect.SelectedIndex];
+            SpeedInX.Content = Lattice.Lattices[inputX, inputY].SpeedInX;
+            SpeedInY.Content = Lattice.Lattices[inputX, inputY].SpeedInY;
         }
     }
 

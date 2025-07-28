@@ -49,7 +49,7 @@
     <PackageReference Include="MSTest.TestFramework" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BachBoltyman\BachBoltyman.csproj" />
+    <ProjectReference Include="..\BachBoltyman\BachBoltzman.csproj" />
   </ItemGroup>
 
   <!-- 

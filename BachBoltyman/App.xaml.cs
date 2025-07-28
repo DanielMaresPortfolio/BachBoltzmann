@@ -20,7 +20,7 @@ namespace BachBoltzman
     }
     public class InicLayout
     {
-        private int sx = 250; //250
+        private int sx = 200; //250
         private int sy = 100; //100
         public int SizeX { get => sx; set => sx = value; }
         public int SizeY { get => sy; set => sy = value; }
@@ -29,33 +29,33 @@ namespace BachBoltzman
         {
             get
             {
-                int px = sx / 2;
-                int py = sy / 2;
-                int r = 10;
+                //int px = sx / 2;
+                //int py = sy / 2;
+                //int r = 10;
+                //bool[,] testingLayout = new bool[sx, sy];
+                //for (int x = 0; x < sx; x++)
+                //{
+                //    for (int y = 0; y < sy; y++)
+                //    {
+                //        testingLayout[x, y] = false;
+                //        if ((((x - px) * (x - px)) + ((y - py) * (y - py))) < r * r || y == 0 || y == (sy - 1))
+                //        {
+                //            testingLayout[x, y] = true;
+                //        }
+                //    }
+                //}
                 bool[,] testingLayout = new bool[sx, sy];
                 for (int x = 0; x < sx; x++)
                 {
                     for (int y = 0; y < sy; y++)
                     {
                         testingLayout[x, y] = false;
-                        if ((((x - px) * (x - px)) + ((y - py) * (y - py))) < r * r || y == 0 || y == (sy - 1))
+                        if (y == 0 || y == (sy - 1)) //-> || x ==(sx-1) stena na konci
                         {
                             testingLayout[x, y] = true;
                         }
                     }
                 }
-                //                bool[,] testingLayout = new bool[sx, sy];
-                //                for (int x = 0; x<sx; x++)
-                //                {
-                //                    for (int y = 0; y<sy; y++)
-                //                    {
-                //                        testingLayout[x, y] = false;
-                //                        if (y == 0 || y == (sy - 1) ) //-> || x ==(sx-1) stena na konci
-                //                        {
-                //                            testingLayout[x, y] = true;
-                //                        }
-                //}
-                //                }
                 return testingLayout;
             }
         }

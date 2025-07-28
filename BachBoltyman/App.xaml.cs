@@ -20,41 +20,42 @@ namespace BachBoltzman
     }
     public class InicLayout
     {
-        private int sx = 100; //250
-        private int sy = 50; //100
+        private int sx = 250; //250
+        private int sy = 100; //100
         public int SizeX { get => sx; set => sx = value; }
         public int SizeY { get => sy; set => sy = value; }
         public bool[,] MyLayout { get; set; }
         public bool[,] TestingLayout
         {
-            get {
-                //int px = sx/2;
-                //int py = sy/2;
-                //int r = 10;
-                //bool[,] testingLayout = new bool[sx, sy];
-                //for (int x = 0; x < sx; x++)
-                //{
-                //    for (int y = 0; y < sy; y++)
-                //    {
-                //        testingLayout[x, y] = false;
-                //        if ((((x - px) * (x - px)) + ((y - py) * (y - py))) < r * r || y == 0 || y == (sy - 1))
-                //        {
-                //            testingLayout[x, y] = true;
-                //        }
-                //    }
-                //}
+            get
+            {
+                int px = sx / 2;
+                int py = sy / 2;
+                int r = 10;
                 bool[,] testingLayout = new bool[sx, sy];
                 for (int x = 0; x < sx; x++)
                 {
                     for (int y = 0; y < sy; y++)
                     {
                         testingLayout[x, y] = false;
-                        if (y == 0 || y == (sy - 1) || x ==(sx-1)) //->  x ==(sx-1) stena na konci
+                        if ((((x - px) * (x - px)) + ((y - py) * (y - py))) < r * r || y == 0 || y == (sy - 1))
                         {
                             testingLayout[x, y] = true;
                         }
                     }
                 }
+                //                bool[,] testingLayout = new bool[sx, sy];
+                //                for (int x = 0; x<sx; x++)
+                //                {
+                //                    for (int y = 0; y<sy; y++)
+                //                    {
+                //                        testingLayout[x, y] = false;
+                //                        if (y == 0 || y == (sy - 1) ) //-> || x ==(sx-1) stena na konci
+                //                        {
+                //                            testingLayout[x, y] = true;
+                //                        }
+                //}
+                //                }
                 return testingLayout;
             }
         }
@@ -146,11 +147,11 @@ namespace BachBoltzman
             get => wall;
             set => wall = value;
         }
-        private double[] wallspeeds = new double[d2Q9.NumberOfSpeeds];
-        public double[] WallSpeeds
+        private double wallSpeedX =0;
+        public double WallSpeedX
         {
-            get => wallspeeds;
-            set => wallspeeds = value;
+            get => wallSpeedX;
+            set => wallSpeedX = value;
         }
         private bool pressureOutFlow;
         public bool IsPressureOutFlow
@@ -235,15 +236,12 @@ namespace BachBoltzman
         }
         static void BounceBack(int px, int py, int tx, int ty, double densityWall)
         {
-            int sx = tx-px+1;
-            int sy = ty-py+1;
-            double[] latPosCol = new double[d2Q9.NumberOfSpeeds];
-            int[,] zf = { { 6, 2, 5 }, 
-                         { 3, 0, 1 },
-                          { 7, 4, 8 }};
-            //int[] nf={0,1,2,3,4,5,6,7,8};
-            int[] of = {0,3,4,1,2,7,8,5,6};
-            Lattices[px, py].f[zf[sx,sy]] = Lattices[px,py].f_post[of[zf[sx,sy]]] - 6 * d2Q9.WeightsOfEDFs[zf[sx,sy]] * densityWall * d2Q9.InicialSpeedX[zf[sx, sy]] * Lattices[tx,ty].WallSpeeds[of[zf[sx,sy]]];
+            int[] nf={0,1,2,3,4,5,6,7,8}; //d2q9
+            int[] of ={0,3,4,1,2,7,8,5,6};
+            for (int k =0; k<d2Q9.NumberOfSpeeds;k++) 
+            {
+                Lattices[px, py].f[nf[k]] = Lattices[px, py].f_post[of[k]] - 6 * d2Q9.WeightsOfEDFs[of[k]] * densityWall * d2Q9.InicialSpeedX[of[k]] * Lattices[tx,ty].WallSpeedX;
+            }
         }
         static void PressureOuflow(int px, int py, double densityWall) 
         {
@@ -255,15 +253,15 @@ namespace BachBoltzman
                 //Lattices[px, py].f[8] = (Lattices[px,py].f[2] - Lattices[px, py].f[4] + 2 * Lattices[px, py].f[6] + Lattices[px, py].f[3] - Lattices[px, py].f[1]+uin *densityWall/Math.Sqrt(d2Q9.SoundSpeedPowerTwo))/2;
                 //Lattices[px, py].f[5] = densityWall - (Lattices[px, py].f[0]+ Lattices[px, py].f[2] + Lattices[px, py].f[3] + Lattices[px, py].f[4] + Lattices[px, py].f[6] + Lattices[px, py].f[7] + Lattices[px, py].f[8]);
 
-                double uin = 1 - 1 / densityWall * (2 * Lattices[px, py].f[5] + 2 * Lattices[px, py].f[1] + Lattices[px, py].f[8] + Lattices[px, py].f[0] + Lattices[px, py].f[2] + Lattices[px, py].f[4]);
-                Lattices[px, py].f[3] = Lattices[px,py].f[1]-6*d2Q9.WeightsOfEDFs[3]*densityWall*uin;
+                double uin = -1 + 1 / densityWall * (2 * Lattices[px, py].f[5] + Lattices[px, py].f[1] + Lattices[px, py].f[8] + Lattices[px, py].f[0] + Lattices[px, py].f[2] + Lattices[px, py].f[4]);
+                Lattices[px, py].f[3] = Lattices[px,py].f[1] - 6*d2Q9.WeightsOfEDFs[3]*densityWall*uin;
                 double mezplus6_7 = densityWall - (Lattices[px, py].f[0] + Lattices[px, py].f[1] + Lattices[px, py].f[2] + Lattices[px, py].f[3] + Lattices[px, py].f[4] + Lattices[px, py].f[5] + Lattices[px, py].f[8]);
                 double mezminus6_7 = Lattices[px, py].f[4] + Lattices[px, py].f[8] - Lattices[px, py].f[2] - Lattices[px, py].f[5];
-                Lattices[px, py].f[7] =(mezplus6_7+mezminus6_7)/2;
-                Lattices[px, py].f[6] = (mezplus6_7 - mezminus6_7) / 2;
+                Lattices[px, py].f[6] =(mezplus6_7+mezminus6_7)/2;
+                Lattices[px, py].f[7] = (mezplus6_7-mezminus6_7)/2;
             }
         }
-        static void InitializeLayout(bool[,] layout, double[] speedsOnEntry)
+        static void InitializeLayout(bool[,] layout, double speedsOnEntryX)
         {
             for (int ix = 0; ix < Lattices.GetLength(0); ix++)
             {
@@ -273,16 +271,12 @@ namespace BachBoltzman
                     Lattices[ix, iy].IsWall = layout[ix, iy];
                     if (ix == 0 && iy != 0 && iy != Lattices.GetLength(1))
                     {
-                        Lattices[ix, iy].WallSpeeds = speedsOnEntry;
+                        Lattices[ix, iy].WallSpeedX = speedsOnEntryX;
                         Lattices[ix, iy].IsWall = true;
-                    }
-                    else 
-                    {
-                        Lattices[ix, iy].WallSpeeds =[0,0,0,0,0,0,0,0,0];
                     }
                     if (ix == Lattices.GetLength(0)-1 && iy != 0 && iy != Lattices.GetLength(1)-1)
                     {
-                        //Lattices[ix, iy].IsPressureOutFlow = true;
+                        Lattices[ix, iy].IsPressureOutFlow = true;
                     }
                 }
             }
@@ -384,7 +378,7 @@ namespace BachBoltzman
 
             OutputSpeeds = new double[x,y,Convert.ToInt32((timeCykle / timeSnap) + 1)];
             OutputDensity = new double[x, y, Convert.ToInt32((timeCykle / timeSnap) +  1)];
-            InitializeLayout(layout, [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]);//0, 0.1, 0, 0, 0, 0.1, 0, 0, 0.1
+            InitializeLayout(layout, 0.1);//0, 0.1, 0, 0, 0, 0.1, 0, 0, 0.1
             InitializeEquilibrium(inicialSpeedInX, inicialSpeedInY,inicialViskozkozity);
             int i = 0;
             //string densityLine = null;

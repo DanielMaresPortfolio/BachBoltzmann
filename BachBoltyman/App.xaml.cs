@@ -242,15 +242,15 @@ namespace BachBoltzman
             }
             return v;
         }
-        static void BounceBack(int px, int py, int tx, int ty, double densityWall)
-        {
-            //int[] nf={0,1,2,3,4,5,6,7,8}; //d2q9
-            int[] of ={0,3,4,1,2,7,8,5,6};
-            for (int k =0; k<d2Q9.NumberOfSpeeds;k++) 
-            {
-                Lattices[px, py].f[k] = Lattices[px, py].f_post[of[k]] - 6 * d2Q9.WeightsOfEDFs[of[k]] * densityWall * d2Q9.InicialSpeedX[of[k]] * Lattices[tx,ty].WallSpeedX;
-            }
-        }
+        //static void BounceBack(int px, int py, int tx, int ty, double densityWall)
+        //{
+        //    //int[] nf={0,1,2,3,4,5,6,7,8}; //d2q9
+        //    int[] of ={0,3,4,1,2,7,8,5,6};
+        //    for (int k =0; k<d2Q9.NumberOfSpeeds;k++) 
+        //    {
+        //        Lattices[px, py].f[k] = Lattices[px, py].f_post[of[k]] - 6 * d2Q9.WeightsOfEDFs[of[k]] * densityWall * d2Q9.InicialSpeedX[of[k]] * Lattices[tx,ty].WallSpeedX;
+        //    }
+        //}
         static void PressureOuflow(int px, int py, double densityWall) 
         {
             //pressure outlow Zao 2.79 -2.82
@@ -277,9 +277,12 @@ namespace BachBoltzman
                 {
                     Lattices[ix, iy] = new Lattice();
                     Lattices[ix, iy].IsWall = layout[ix, iy];
-                    if (ix == 0 && iy != 0 && iy != Lattices.GetLength(1))
+                    if (ix == 0 && iy != 0 && iy != Lattices.GetLength(1)-1)
                     {
-                        Lattices[ix, iy].WallSpeedX = speedsOnEntryX;
+                        for (int k =0; k<d2Q9.NumberOfSpeeds;k++)
+                        {
+                            Lattices[ix, iy].f[k] = -6 * d2Q9.WeightsOfEDFs[k] * d2Q9.InicialSpeedX[k] * speedsOnEntryX;
+                        }
                         Lattices[ix, iy].IsWall = true;
                     }
                     if (ix == Lattices.GetLength(0) && iy != 0 && iy != Lattices.GetLength(1))
@@ -310,6 +313,7 @@ namespace BachBoltzman
             int jd;
             int id;
             int k;
+            int[] of = { 0, 3, 4, 1, 2, 7, 8, 5, 6 }; 
             for (j = 0; j < x; j++)
             {
                 for (i = 0; i < y; i++)
@@ -329,7 +333,8 @@ namespace BachBoltzman
                             {
                                 if (Lattices[j, i].IsWall == false)
                                 {
-                                    BounceBack(j, i,jd,id, 1); 
+                                    //BounceBack(j, i,jd,id, 1); 
+                                    Lattices[j, i].f[k] = Lattices[j, i].f_post[of[k]] + Lattices[jd,id].f[of[k]];
                                 }
                             }
                         }

@@ -18,15 +18,21 @@
         </Grid.RowDefinitions>
         <Grid Grid.Row="1" Grid.Column="1" Name="controlPanels">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="4*"></ColumnDefinition>
-                <ColumnDefinition Width="1*"></ColumnDefinition>
                 <ColumnDefinition Width="2*"></ColumnDefinition>
+                <ColumnDefinition Width="2*"></ColumnDefinition>
+                <ColumnDefinition Width="2*"></ColumnDefinition>
+                <ColumnDefinition Width="4*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
+                <RowDefinition Height="1*"></RowDefinition>
                 <RowDefinition Height="3*"></RowDefinition>
                 <RowDefinition Height="1*"></RowDefinition>
             </Grid.RowDefinitions>
+            <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding XSize}"/>
+            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding YSize}"/>
+            <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding Vizkozity}"/>
         </Grid>
         <Button Name="testing" Grid.Column="2" Content="testing" Grid.Row="1" Click="Testing" BorderBrush="#FFFFF5F5"/>
+        <Image Grid.Column="1" Grid.Row="0" Width="{Binding XSize}" Height="{Binding YSize}" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="InputIm" MouseMove="InputIm_MouseMove" MouseRightButtonDown="InputIm_MouseRightButtonDown" MouseLeftButtonDown="InputIm_MouseLeftButtonDown"/>
     </Grid>
 </Window>

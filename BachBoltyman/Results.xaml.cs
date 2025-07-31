@@ -27,7 +27,7 @@ namespace BachBoltyman
     public partial class Results : Window, INotifyPropertyChanged
     {
         private Lattice lattice;
-        public Results(int[] alltime_, ref Lattice lattice_) //zkusit ref na Lattice v App
+        public Results(int[] alltime_, ref Lattice lattice_) 
         {
             lattice = lattice_;
             AllTime = alltime_;
@@ -106,8 +106,6 @@ namespace BachBoltyman
                     }
                 }
             }
-
-
             MinMaxMap.Content ="max value =" + Convert.ToString(maxValueMap)+ Environment.NewLine + ",min value =" + Convert.ToString(minValueMap);
             for (int ix = 0; ix < width; ix++)
             {

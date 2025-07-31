@@ -20,6 +20,14 @@ namespace BachBoltzman
     }
     public class InicLayout
     {
+        public InicLayout() 
+        {
+        }
+        public InicLayout(int sizeOfLayoutX, int sizeOfLayoutY) 
+        {
+            sx = sizeOfLayoutX;
+            sy = sizeOfLayoutY;
+        }
         private int sx = 100; //250
         private int sy = 50; //100
         public int SizeX { get => sx; set => sx = value; }

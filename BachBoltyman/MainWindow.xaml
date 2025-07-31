@@ -28,11 +28,13 @@
                 <RowDefinition Height="3*"></RowDefinition>
                 <RowDefinition Height="1*"></RowDefinition>
             </Grid.RowDefinitions>
-            <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding XSize}"/>
-            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding YSize}"/>
-            <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding Vizkozity}"/>
+            <TextBox Grid.Row="1" Grid.Column="0" x:Name="SizeX"/>
+            <TextBox Grid.Row="1" Grid.Column="1" x:Name="SizeY"/>
+            <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding Viskozity, Mode=TwoWay}"/>
+            <Button Grid.Row="1" Grid.Column="4" Content="Generate" Name="Generate" Click="Generate_Click"/>
+            <!-- -->
         </Grid>
         <Button Name="testing" Grid.Column="2" Content="testing" Grid.Row="1" Click="Testing" BorderBrush="#FFFFF5F5"/>
-        <Image Grid.Column="1" Grid.Row="0" Width="{Binding XSize}" Height="{Binding YSize}" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="InputIm" MouseMove="InputIm_MouseMove" MouseRightButtonDown="InputIm_MouseRightButtonDown" MouseLeftButtonDown="InputIm_MouseLeftButtonDown"/>
+        <Canvas Grid.Column="1" Grid.Row="0" x:Name="InpIm" Width="{Binding Path=Text, ElementName=SizeX}" Height="{Binding Path=Text, ElementName=SizeY}" Background="Black" MouseMove="InpIm_MouseMove" MouseLeftButtonDown="InpIm_MouseLeftButtonDown" SizeChanged="InpIm_SizeChanged"/> 
     </Grid>
 </Window>

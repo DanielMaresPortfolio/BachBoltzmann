@@ -356,7 +356,7 @@ namespace BachBoltzman
 
             double testWallsEmpty = 0;
 
-            for (int ix = 0; ix < x; ix++)
+            Parallel.For(0, x, ix =>//for (int ix = 0; ix < x; ix++)
             {
                 for (int iy = 0; iy < y; iy++)
                 {
@@ -364,7 +364,7 @@ namespace BachBoltzman
                     {
                         if (Lattices[ix, iy].IsWall == false)
                         {
-                            double omega = (Lattices[ix,iy].f[k]-Lattices[ix, iy].Equilibrium()[k]) / Lattices[ix, iy].RelaxTime;
+                            double omega = (Lattices[ix, iy].f[k] - Lattices[ix, iy].Equilibrium()[k]) / Lattices[ix, iy].RelaxTime;
                             Lattices[ix, iy].f_post[k] = Lattices[ix, iy].f[k] - omega;
 
                             if (Lattices[ix, iy].Density > 1.5)
@@ -374,7 +374,7 @@ namespace BachBoltzman
                         }
                         else //test, ze steny jsou prazdny
                         {
-                            for (k=0;k<d2Q9.NumberOfSpeeds;k++) 
+                            for (k = 0; k < d2Q9.NumberOfSpeeds; k++)
                             {
                                 testWallsEmpty += Lattices[ix, iy].f[k];
                             }
@@ -385,7 +385,7 @@ namespace BachBoltzman
                         }
                     }
                 }
-            }
+            });
         }
         static public void Run(int timeCykle, int timeSnap, double inicialSpeedInX, double inicialSpeedInY, double inicialViskozkozity, bool[,] layout)
         {
@@ -399,7 +399,7 @@ namespace BachBoltzman
             InitializeLayout(layout, 0.1);//0, 0.1, 0, 0, 0, 0.1, 0, 0, 0.1
             InitializeEquilibrium(inicialSpeedInX, inicialSpeedInY,inicialViskozkozity);
             int i = 0;
-            for (int t = 0; t <= timeCykle; t++)
+            for (int t = 0; t <= timeCykle; t++)//Parallel.For(0,timeCykle,t=> 
             {
                 CollideBGK();
                 Stream();
@@ -417,7 +417,7 @@ namespace BachBoltzman
                     }
                     i++;
                 }
-            }
+            }//);
         }
     }
 }

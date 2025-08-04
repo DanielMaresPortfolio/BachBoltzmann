@@ -313,18 +313,15 @@ namespace BachBoltzman
         {
             int x = Lattices.GetLength(0);
             int y = Lattices.GetLength(1);
-
-            int j;
-            int i;
             int jd;
             int id;
-            int k;
             int[] of = { 0, 3, 4, 1, 2, 7, 8, 5, 6 };
-            Parallel.For(0, x, j=>
+
+            for(int j =0; j < x; j++) // Parallel.For(0, x, j=>
             {
-                for (i = 0; i < y; i++)
+                for (int i = 0; i < y; i++)
                 {
-                    for (k = 0; k < d2Q9.NumberOfSpeeds; k++)
+                    for (int k = 0; k < d2Q9.NumberOfSpeeds; k++)
                     {
                         //Reseno Upwindem
                         jd = j - d2Q9.InicialSpeedX[k];
@@ -350,7 +347,7 @@ namespace BachBoltzman
                         PressureOuflow(j, i, 1);
                     }
                 }
-            });
+            }//);
         }
         public static void CollideBGK()
         {

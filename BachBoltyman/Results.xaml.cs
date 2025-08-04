@@ -1,6 +1,11 @@
-﻿using System;
+﻿using BachBoltzman;
+using Microsoft.VisualBasic.ApplicationServices;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel;
+using System.IO;
+using System.Linq;
 using System.Linq;
 using System.Security.Permissions;
 using System.Text;
@@ -14,10 +19,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Windows.Shapes;
-using System.ComponentModel;
 using System.Xaml;
-using System.Linq;
-using BachBoltzman;
 
 namespace BachBoltyman
 {
@@ -27,7 +29,7 @@ namespace BachBoltyman
     public partial class Results : Window, INotifyPropertyChanged
     {
         private Lattice lattice;
-        public Results(int[] alltime_, ref Lattice lattice_) 
+        public Results(int[] alltime_, ref Lattice lattice_)
         {
             lattice = lattice_;
             AllTime = alltime_;
@@ -61,22 +63,27 @@ namespace BachBoltyman
         {
             double v = Lattice.Lattices[1, 1].Viskozity; //abych se koukl do Lattices
             double[,,] map = new double[Lattice.Lattices.GetLength(0), Lattice.Lattices.GetLength(1), AllTime.GetLength(0)];
+            string jmenoSouboru = null;
 
             if (Convert.ToBoolean(SpeedXMap.IsChecked))
             {
                 map = Lattice.OutputSpeedsX;
+                jmenoSouboru = "rychlostiX" + Convert.ToString(index) +".PNG";
             }
             if (Convert.ToBoolean(SpeedYMap.IsChecked))
             {
                 map = Lattice.OutputSpeedsY;
+                jmenoSouboru = "rychlostiY" + Convert.ToString(index) + ".PNG";
             }
             if (Convert.ToBoolean(SpeedsMap.IsChecked))
             {
                 map = Lattice.OutputSpeeds;
+                jmenoSouboru = "rychlostiCelkove" + Convert.ToString(index) + ".PNG";
             }
-            if (Convert.ToBoolean(DensityMap.IsChecked))
+            if (Convert.ToBoolean(DensityMap.IsChecked)) 
             {
                 map = Lattice.OutputDensity;
+                jmenoSouboru = "hustota" + Convert.ToString(index) + ".PNG";
             }
 
             Heatmap.Width = Lattice.OutputDensity.GetLength(0);
@@ -106,7 +113,7 @@ namespace BachBoltyman
                     }
                 }
             }
-            MinMaxMap.Content ="max value =" + Convert.ToString(maxValueMap)+ Environment.NewLine + ",min value =" + Convert.ToString(minValueMap);
+            MinMaxMap.Content = "max value =" + Convert.ToString(maxValueMap) + Environment.NewLine + ",min value =" + Convert.ToString(minValueMap);
             for (int ix = 0; ix < width; ix++)
             {
                 for (int iy = 0; iy < height; iy++)
@@ -130,7 +137,7 @@ namespace BachBoltyman
                         }
                         else
                         {
-                            pixels[i] = (uint)((Convert.ToUInt32(255) << 24) + (Convert.ToUInt32(175) << 16) + (Convert.ToUInt32(grad * 2 / 3) << 8) + Convert.ToUInt32(grad * 1 / 3));
+                            pixels[i] = (uint)((Convert.ToUInt32(255) << 24) + (Convert.ToUInt32(grad * 2 / 3) << 16) + (Convert.ToUInt32(120) << 8) + Convert.ToUInt32(grad * 1 / 3));
                         }
                     }
                     //switch (mapInTime[ix, iy])
@@ -147,6 +154,10 @@ namespace BachBoltyman
                     //}
                     bitmap.WritePixels(new Int32Rect(0, 0, width, height), pixels, width * 4, 0);
                     Heatmap.Source = bitmap;
+
+                    //ukladani obrazku
+             
+                    SavePNG(bitmap, jmenoSouboru);
                 }
             }
         }
@@ -164,78 +175,21 @@ namespace BachBoltyman
 
             Density.Content = "density =" + Convert.ToString(Lattice.OutputDensity[inputX, inputY, TimeSelect.SelectedIndex]);
             SpeedInX.Content = "speed in X =" + Lattice.OutputSpeedsX[inputX, inputY, TimeSelect.SelectedIndex];
-            SpeedInY.Content ="speed in Y =" + Lattice.OutputSpeedsY[inputX, inputY, TimeSelect.SelectedIndex];
+            SpeedInY.Content = "speed in Y =" + Lattice.OutputSpeedsY[inputX, inputY, TimeSelect.SelectedIndex];
+        }
+
+        // Save the WriteableBitmap into a PNG file.
+        public static void SavePNG(WriteableBitmap wbitmap,
+            string filename)
+        {
+            // Save the bitmap into a file.
+            using (FileStream stream =
+                new FileStream(filename, FileMode.Create))
+            {
+                PngBitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(wbitmap));
+                encoder.Save(stream);
+            }
         }
     }
-
-    //    try 
-    //    {
-    //        bitmap.Lock();
-    //        unsafe 
-    //        {
-
-    //        }
-    //        bitmap.AddDirtyRect(new Int32Rect(0, 0, width, height));
-    //    }
-    //    finally 
-    //    {
-    //        bitmap.Unlock(); 
-    //    }
-    //               Heatmap.Source = bitmap;
-    //}
-
-    //public class Output() : INotifyPropertyChanged
-    //{
-    //    public event PropertyChangedEventHandler PropertyChanged;
-    //    int selectedTime = 0;
-    //    public int SelectedTime
-    //    { get => selectedTime; set => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SelectedTime")); }
-    //    private double[,,] speedMap;
-    //    public double[,,] SpeedMap { get => speedMap; set => speedMap = value; }
-    //    public Lattice[,,] LatticesOutput { get; set; }
-
-    //        public WriteableBitmap Heatmap
-    //        {
-    //            get 
-    //            {
-    //                int width = 500;
-    //                int height = 500;
-    //                WriteableBitmap bitmap = new WriteableBitmap(width, height, 96, 96, PixelFormats.Bgra32, null);
-    //                uint[] pixels = new uint[width * height];
-    //                 for (int ix = 0; ix < width; ix++)
-    //                 {
-    //                     for (int iy = 0; iy < height; iy++)
-    //                    {
-    //                        int i = width * iy + ix;
-    //                        switch (speedMap[ix, iy, selectedTime]) //colours cs^2 = 1/3 -> 0:0.577 //ehm plotuju density
-    //                        {
-    //                        case -1:
-    //                            pixels[i] = (uint)((255) + (0) + (0)); //wall colour (pure blue)
-    //                            break;
-    //                        case > 0.577: 
-    //                            pixels[i] = (uint)((0) + (0) + (255)); //error colour (pure green)
-    //                            break;
-    //                        case double n when (n > 0 && n < 0.115):
-    //                            pixels[i] = (uint)((251) + (99) + (11));
-    //                            break;
-    //                        case double n when (n > 0.115 && n < 0.231):
-    //                            pixels[i] = (uint)((250) + (70) + (48));
-    //                            break;
-    //                        case double n when (n > 0.231 && n < 0.346):
-    //                            pixels[i] = (uint)((233) + (50) + (73));
-    //                            break;
-    //                        case double n when (n > 0.346 && n < 0.462):
-    //                            pixels[i] = (uint)((196) + (54) + (87));
-    //                            break;
-    //                        case double n when (n > 0.462 && n < 0.577):
-    //                            pixels[i] = (uint)((171) + (55) + (87));
-    //                            break;
-    //                         }                                          
-    //                     }
-    //                 }
-    //            bitmap.WritePixels(new Int32Rect(0, 0, width, height), pixels, width * 4, 0);
-    //            return bitmap;
-    //        }
-    //        }
-    //}
 }

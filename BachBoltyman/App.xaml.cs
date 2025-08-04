@@ -9,6 +9,9 @@ using System.Windows.Automation;
 using System.Windows.Shapes;
 using System.Xaml;
 using Path = System.IO.Path;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BachBoltzman
 {
@@ -28,8 +31,8 @@ namespace BachBoltzman
             sx = sizeOfLayoutX;
             sy = sizeOfLayoutY;
         }
-        private int sx = 100; //250
-        private int sy = 50; //100
+        private int sx = 250; //250
+        private int sy = 100; //100
         public int SizeX { get => sx; set => sx = value; }
         public int SizeY { get => sy; set => sy = value; }
         public bool[,] MyLayout { get; set; }
@@ -37,33 +40,33 @@ namespace BachBoltzman
         {
             get
             {
-                //int px = sx / 2;
-                //int py = sy / 2;
-                //int r = 10;
-                //bool[,] testingLayout = new bool[sx, sy];
-                //for (int x = 0; x < sx; x++)
-                //{
-                //    for (int y = 0; y < sy; y++)
-                //    {
-                //        testingLayout[x, y] = false;
-                //        if ((((x - px) * (x - px)) + ((y - py) * (y - py))) < r * r || y == 0 || y == (sy - 1))
-                //        {
-                //            testingLayout[x, y] = true;
-                //        }
-                //    }
-                //}
+                int px = sx / 2;
+                int py = sy / 2;
+                int r = 10;
                 bool[,] testingLayout = new bool[sx, sy];
                 for (int x = 0; x < sx; x++)
                 {
                     for (int y = 0; y < sy; y++)
                     {
                         testingLayout[x, y] = false;
-                        if (y == 0 || y == (sy - 1)) //-> || x ==(sx-1) stena na konci
+                        if ((((x - px) * (x - px)) + ((y - py) * (y - py))) < r * r || y == 0 || y == (sy - 1))
                         {
                             testingLayout[x, y] = true;
                         }
                     }
                 }
+                //bool[,] testingLayout = new bool[sx, sy];
+                //for (int x = 0; x < sx; x++)
+                //{
+                //    for (int y = 0; y < sy; y++)
+                //    {
+                //        testingLayout[x, y] = false;
+                //        if (y == 0 || y == (sy - 1)) //-> || x ==(sx-1) stena na konci
+                //        {
+                //            testingLayout[x, y] = true;
+                //        }
+                //    }
+                //}
                 return testingLayout;
             }
         }
@@ -264,11 +267,6 @@ namespace BachBoltzman
             //pressure outlow Zao 2.79 -2.82
             if (Lattices[px, py].IsPressureOutFlow)
             {
-                //double uin = Math.Sqrt(d2Q9.SoundSpeedPowerTwo) - Math.Sqrt(d2Q9.SoundSpeedPowerTwo) / densityWall * (2*Lattices[px, py].f[3]+2*Lattices[px, py].f[6]+2*Lattices[px, py].f[7]+ Lattices[px, py].f[0]+ Lattices[px, py].f[2]+ Lattices[px, py].f[4]);
-                //Lattices[px, py].f[1] = Lattices[px, py].Equilibrium()[1] + Lattices[px, py].f[3] - Lattices[px, py].Equilibrium()[3];
-                //Lattices[px, py].f[8] = (Lattices[px,py].f[2] - Lattices[px, py].f[4] + 2 * Lattices[px, py].f[6] + Lattices[px, py].f[3] - Lattices[px, py].f[1]+uin *densityWall/Math.Sqrt(d2Q9.SoundSpeedPowerTwo))/2;
-                //Lattices[px, py].f[5] = densityWall - (Lattices[px, py].f[0]+ Lattices[px, py].f[2] + Lattices[px, py].f[3] + Lattices[px, py].f[4] + Lattices[px, py].f[6] + Lattices[px, py].f[7] + Lattices[px, py].f[8]);
-
                 double uin = -1 + 1 / densityWall * (2 * Lattices[px, py].f[5] + Lattices[px, py].f[1] + Lattices[px, py].f[8] + Lattices[px, py].f[0] + Lattices[px, py].f[2] + Lattices[px, py].f[4]);
                 Lattices[px, py].f[3] = Lattices[px,py].f[1] - 6*d2Q9.WeightsOfEDFs[3]*densityWall*uin;
                 double mezplus6_7 = densityWall - (Lattices[px, py].f[0] + Lattices[px, py].f[1] + Lattices[px, py].f[2] + Lattices[px, py].f[3] + Lattices[px, py].f[4] + Lattices[px, py].f[5] + Lattices[px, py].f[8]);
@@ -321,8 +319,8 @@ namespace BachBoltzman
             int jd;
             int id;
             int k;
-            int[] of = { 0, 3, 4, 1, 2, 7, 8, 5, 6 }; 
-            for (j = 0; j < x; j++)
+            int[] of = { 0, 3, 4, 1, 2, 7, 8, 5, 6 };
+            Parallel.For(0, x, j=>
             {
                 for (i = 0; i < y; i++)
                 {
@@ -352,7 +350,7 @@ namespace BachBoltzman
                         PressureOuflow(j, i, 1);
                     }
                 }
-            }
+            });
         }
         public static void CollideBGK()
         {
@@ -408,19 +406,19 @@ namespace BachBoltzman
             {
                 CollideBGK();
                 Stream();
-                if (t %timeSnap == 0)
+                if (t % timeSnap == 0)
                 {
                     for (int px = 0; px < x; px++)
                     {
                         for (int py = 0; py < y; py++)
                         {
-                            OutputSpeedsX[px,py,i] = Lattices[px, py].SpeedInX;
+                            OutputSpeedsX[px, py, i] = Lattices[px, py].SpeedInX;
                             OutputSpeedsY[px, py, i] = Lattices[px, py].SpeedInY;
                             OutputSpeeds[px, py, i] = Math.Sqrt(Math.Pow(Lattices[px, py].SpeedInX, 2) + Math.Pow(Lattices[px, py].SpeedInY, 2));
                             OutputDensity[px, py, i] = Lattices[px, py].Density;
-                        }        
+                        }
                     }
-                i++;
+                    i++;
                 }
             }
         }
